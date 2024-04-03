@@ -6,30 +6,12 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-
+	
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 )
 
 var db *sql.DB
-
-type Answer struct {
-	ID    int
-	Text  string
-	Value string
-}
-
-type Question struct {
-	ID      int
-	Title   string
-	Answers []Answer
-}
-
-type Survey struct {
-	ID        int
-	Title     string
-	Questions []Question
-}
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("templates/index.html"))
@@ -43,7 +25,7 @@ func chooseHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	defer rows.Close()
-
+	
 	var surveys []Survey
 	for rows.Next() {
 		var survey Survey
@@ -53,7 +35,7 @@ func chooseHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		surveys = append(surveys, survey)
 	}
-
+	
 	tmpl := template.Must(template.ParseFiles("templates/choose.html"))
 	tmpl.Execute(w, surveys)
 }
@@ -61,10 +43,10 @@ func chooseHandler(w http.ResponseWriter, r *http.Request) {
 func surveyHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-
+	
 	// Fetch survey data from the database using survey ID
 	var survey Survey
-
+	
 	// Fetch survey data from the database
 	row := db.QueryRow("SELECT id, title FROM surveys WHERE id = ?", id)
 	err := row.Scan(&survey.ID, &survey.Title)
@@ -75,28 +57,28 @@ func surveyHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Fatal(err)
 	}
-
+	
 	// Fetch questions and answers for the survey from the database
 	rows, err := db.Query("SELECT id, title FROM questions WHERE surveyid = ?", survey.ID)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rows.Close()
-
+	
 	for rows.Next() {
 		var question Question
 		err := rows.Scan(&question.ID, &question.Title)
 		if err != nil {
 			log.Fatal(err)
 		}
-
+		
 		// Fetch answers for each question
 		answerRows, err := db.Query("SELECT id, text, value FROM answers WHERE questionid = ?", question.ID)
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer answerRows.Close()
-
+		
 		for answerRows.Next() {
 			var answer Answer
 			err := answerRows.Scan(&answer.ID, &answer.Text, &answer.Value)
@@ -105,10 +87,10 @@ func surveyHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			question.Answers = append(question.Answers, answer)
 		}
-
+		
 		survey.Questions = append(survey.Questions, question)
 	}
-
+	
 	// Temporary solution
 	// data, err := json.Marshal(survey)
 	// if err != nil {
@@ -116,12 +98,12 @@ func surveyHandler(w http.ResponseWriter, r *http.Request) {
 	// }
 	// w.Header().Set("Content-Type", "application/json")
 	// w.Write(data)
-
+	
 	tmpl, err := template.ParseFiles("templates/survey.html")
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	
 	// Execute the template with survey data
 	err = tmpl.Execute(w, survey)
 	if err != nil {
@@ -141,9 +123,9 @@ func main() {
 	r.HandleFunc("/", indexHandler)
 	r.HandleFunc("/choose", chooseHandler)
 	r.HandleFunc("/survey/{id}", surveyHandler)
-
+	
 	http.Handle("/", r)
-
+	
 	fmt.Println("Server is running on port 8080...")
 	http.ListenAndServe(":8080", nil)
 }

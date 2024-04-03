@@ -3,7 +3,7 @@ package main
 type Answer struct {
 	ID    int
 	Text  string
-	Value string
+	Value int
 }
 
 type Question struct {
@@ -18,10 +18,10 @@ type Survey struct {
 	Questions []Question
 }
 
-type SurveyWithAnswers struct {
-	ID      int
-	Title   string
-	Answers []int
+type SurveyResults struct {
+	SurveyID  int
+	PatientID int
+	Picked    map[int]int
 }
 
 type FamilyEnvironmentalScaleResponse struct {

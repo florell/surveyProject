@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Title}}</title>
+    <title>Survey</title>
 </head>
 <body>
-    <h1>{{.Title}}</h1>
-    {{range .Questions}}
-    <h2>{{.ID}}: {{.Title}}</h2>
-    <ul>
-        {{range .Answers}}
-        <li>
-            <input type="radio" id="answer{{.ID}}" name="question{{$.ID}}" value="{{.Value}}">
-            <label for="answer{{.ID}}">{{.Text}}</label>
-        </li>
-        {{end}}
-    </ul>
-    {{end}}
+    <h1>{{ .Title }}</h1>
+    <form action="/submit_survey" method="post">
+        <input type="hidden" name="survey_id" value="{{ .SurveyID }}">
+        {{ range $index, $question := .Questions }}
+            <h2>{{ $question.Title }}</h2>
+            {{ range $answerIndex, $answer := $question.Answers }}
+                <input type="radio" id="question{{ $question.QuestionID }}_answer{{ $answer.AnswerID }}" name="question{{ $question.QuestionID }}" value="{{ $answer.AnswerID }}">
+                <label for="question{{ $question.QuestionID }}_answer{{ $answer.AnswerID }}">{{ $answer.Text }}</label><br>
+            {{ end }}
+            <br>
+        {{ end }}
+        <input type="submit" value="Submit">
+    </form>
 </body>
 </html>

@@ -1,19 +1,19 @@
 package main
 
 type Answer struct {
-	ID    int
-	Text  string
-	Value int
+	AnswerID int
+	Text     string
+	Value    int
 }
 
 type Question struct {
-	ID      int
-	Title   string
-	Answers []Answer
+	QuestionID int
+	Title      string
+	Answers    []Answer
 }
 
 type Survey struct {
-	ID        int
+	SurveyID  int
 	Title     string
 	Questions []Question
 }

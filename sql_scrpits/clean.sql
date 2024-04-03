@@ -6,6 +6,8 @@ SET FOREIGN_KEY_CHECKS = 0;
 TRUNCATE surveys;
 TRUNCATE questions;
 TRUNCATE answers;
+TRUNCATE patients;
+TRUNCATE survey_results;
 -- Repeat the TRUNCATE statement for each table you want to truncate
 
 -- Enable foreign key check back

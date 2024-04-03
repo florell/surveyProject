@@ -14,22 +14,30 @@ func pushTest(db *sql.DB) {
 	jsonData := `
 	{
 		"ID": 2,
-		"Title": "Survey 3",
+		"Title": "Survey AQ",
 		"Questions": [
 			{
-				"Title": "Question 1_3",
+				"Title": "Question first",
 				"Answers": [
-					{"Text": "Option 1", "Value": "value1"},
-					{"Text": "Option 2", "Value": "value2"},
-					{"Text": "Option 3", "Value": "value3"}
+					{"Text": "Option 1989", "Value": 80},
+					{"Text": "Option 2239", "Value": 13},
+					{"Text": "Option 38098098", "Value": 391}
 				]
 			},
 			{
-				"Title": "Question 2_3",
+				"Title": "Question second",
 				"Answers": [
-					{"Text": "Option A", "Value": "valueA"},
-					{"Text": "Option B", "Value": "valueB"},
-					{"Text": "Option C", "Value": "valueC"}
+					{"Text": "Ojf", "Value": 14},
+					{"Text": "Ophu dfg", "Value": 72},
+					{"Text": "Optiijo Cfhdhg", "Value": 49}
+				]
+			},
+			{
+				"Title": "Question third",
+				"Answers": [
+					{"Text": "udas", "Value": 12},
+					{"Text": "opif dfg", "Value": 90},
+					{"Text": "wneiweruigor", "Value": 88}
 				]
 			}
 		]
@@ -44,7 +52,7 @@ func pushTest(db *sql.DB) {
 
 	// Insert survey data into the database
 	insertSurveyQuery := "INSERT INTO surveys (id, title) VALUES (?, ?)"
-	_, err = db.Exec(insertSurveyQuery, survey.ID, survey.Title)
+	_, err = db.Exec(insertSurveyQuery, survey.SurveyID, survey.Title)
 	if err != nil {
 		log.Fatalf("Error inserting survey: %v", err)
 	}
@@ -52,7 +60,7 @@ func pushTest(db *sql.DB) {
 	for _, question := range survey.Questions {
 		// Insert question data into the database
 		insertQuestionQuery := "INSERT INTO questions (surveyid, title) VALUES (?, ?)"
-		res, err := db.Exec(insertQuestionQuery, survey.ID, question.Title)
+		res, err := db.Exec(insertQuestionQuery, survey.SurveyID, question.Title)
 		if err != nil {
 			log.Fatalf("Error inserting question: %v", err)
 		}

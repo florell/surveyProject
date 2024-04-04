@@ -36,3 +36,14 @@ type FamilyEnvironmentalScaleResponse struct {
 	Organization                    int // Организация
 	Control                         int // Контроль
 }
+
+type WaysOfCopingQuestionnaireResponse struct {
+	Confrontation        int // Конфронтация
+	Distancing           int // Дистанцирование
+	SelfControl          int // Самоконтроль
+	SearchSocialSupport  int // Поиск соц. поддержки
+	TakingResponsibility int // Принятие ответственности
+	EscapeAvoidance      int // Бегство-избегание
+	PlanningTheSolution  int // Планирование решения
+	PositiveRevaluation  int // Положительная переоценка
+}

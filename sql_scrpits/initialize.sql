@@ -37,5 +37,3 @@ CREATE TABLE IF NOT EXISTS survey_results (
     FOREIGN KEY (SurveyID) REFERENCES surveys(ID)
 );
 
-
-

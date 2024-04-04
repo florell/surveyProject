@@ -1,4 +1,4 @@
-package main
+package handlers
 
 var (
 	CohesionKeys = map[int]int{
@@ -112,9 +112,9 @@ var (
 	}
 )
 
-func FamilyEnvironmentalScaleHandler(s *SurveyResults) FamilyEnvironmentalScaleResponse {
-	result := FamilyEnvironmentalScaleResponse{}
-	
+func FamilyEnvironmentalScaleHandler(s *main.SurveyResults) main.FamilyEnvironmentalScaleResponse {
+	result := main.FamilyEnvironmentalScaleResponse{}
+
 	for questionId, answer := range s.Picked {
 		if answer == CohesionKeys[questionId] {
 			result.Cohesion++
@@ -147,6 +147,6 @@ func FamilyEnvironmentalScaleHandler(s *SurveyResults) FamilyEnvironmentalScaleR
 			result.Control++
 		}
 	}
-	
+
 	return result
 }

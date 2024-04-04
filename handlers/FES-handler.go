@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	scaleKeys = map[string]map[int]int{
+	scaleFESKeys = map[string]map[int]int{
 		"Cohesion": {
 			1:  1,
 			11: 1,
@@ -123,8 +123,9 @@ var (
 // answer: 0 - No, 1 - Yes
 func FamilyEnvironmentalScaleHandler(s types.SurveyResults) []byte {
 	result := make(map[string]int)
+	
 	for questionID, answer := range s.Picked {
-		for field, keysMap := range scaleKeys {
+		for field, keysMap := range scaleFESKeys {
 			if answer == keysMap[questionID] {
 				result[field]++
 			}

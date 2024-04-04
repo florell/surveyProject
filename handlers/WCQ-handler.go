@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"log"
 	types "psychward/src"
 )
@@ -182,9 +183,77 @@ var (
 			21: []int{75, 75, 80, 73, 74, 72, 72, 70},
 		},
 	}
+	scaleWCQKeys = map[string]map[int]bool{
+		"Confrontation": {
+			2:  true,
+			3:  true,
+			13: true,
+			21: true,
+			26: true,
+			37: true,
+		},
+		"Distancing": {
+			8:  true,
+			9:  true,
+			11: true,
+			16: true,
+			32: true,
+			35: true,
+		},
+		"SelfControl": {
+			6:  true,
+			10: true,
+			27: true,
+			34: true,
+			44: true,
+			49: true,
+			50: true,
+		},
+		"SearchSocialSupport": {
+			4:  true,
+			14: true,
+			17: true,
+			24: true,
+			33: true,
+			36: true,
+		},
+		"TakingResponsibility": {
+			5:  true,
+			19: true,
+			22: true,
+			42: true,
+		},
+		"EscapeAvoidance": {
+			7:  true,
+			12: true,
+			25: true,
+			31: true,
+			38: true,
+			41: true,
+			46: true,
+			47: true,
+		},
+		"PlanningTheSolution": {
+			1:  true,
+			20: true,
+			30: true,
+			39: true,
+			40: true,
+			43: true,
+		},
+		"PositiveRevaluation": {
+			15: true,
+			18: true,
+			23: true,
+			28: true,
+			29: true,
+			45: true,
+			48: true,
+		},
+	}
 )
 
-func ageResolver(age, score int, sex, field string) int {
+func ageAndSexResolver(age, score int, sex, field string) int {
 	var sexInt int
 	switch sex {
 	case "man":
@@ -192,8 +261,7 @@ func ageResolver(age, score int, sex, field string) int {
 	case "woman":
 		sexInt = 0
 	default:
-		log.Println("'sex' can be only 'man' or 'woman'")
-		return -1
+		log.Fatalln("'sex' can be only 'man' or 'woman'")
 	}
 	
 	switch {
@@ -203,11 +271,26 @@ func ageResolver(age, score int, sex, field string) int {
 		return standartPoints[field][score][1+sexInt*4]
 	case age >= 31 && age <= 45:
 		return standartPoints[field][score][2+sexInt*4]
-	case age >= 46:
+	default: // age >= 46
 		return standartPoints[field][score][3+sexInt*4]
 	}
 }
 
-func WaysOfCopingQuestionnaireHandler(s types.SurveyResults) types.WaysOfCopingQuestionnaireResponse {
-
+func WaysOfCopingQuestionnaireHandler(s types.SurveyResults) []byte {
+	result := make(map[string]int)
+	
+	// answer: 0, 1, 2, 3
+	for questionID, answer := range s.Picked {
+		for field, keysMap := range scaleWCQKeys {
+			if keysMap[questionID] {
+				result[field] += ageAndSexResolver(s.Age, answer, s.Sex, field)
+			}
+		}
+	}
+	
+	resultJSON, err := json.Marshal(result)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return resultJSON
 }

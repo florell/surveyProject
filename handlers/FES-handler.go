@@ -116,7 +116,7 @@ var (
 	}
 )
 
-func FamilyEnvironmentalScaleHandler(s *types.SurveyResults) types.FamilyEnvironmentalScaleResponse {
+func FamilyEnvironmentalScaleHandler(s types.SurveyResults) types.FamilyEnvironmentalScaleResponse {
 	result := types.FamilyEnvironmentalScaleResponse{}
 	
 	for questionId, answer := range s.Picked {

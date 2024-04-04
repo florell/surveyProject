@@ -1,4 +1,4 @@
-module psych/ward
+module psychward
 
 go 1.21.4
 

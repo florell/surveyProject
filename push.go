@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	types "psychward/src"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -44,7 +45,7 @@ func pushTest(db *sql.DB) {
 	}`
 
 	// Parse JSON data into Survey struct
-	var survey Survey
+	var survey types.Survey
 	err := json.Unmarshal([]byte(jsonData), &survey)
 	if err != nil {
 		log.Fatalf("Error parsing JSON: %v", err)

@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	types "psychward/src"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -77,10 +78,9 @@ func chooseHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	defer rows.Close()
-
-	var surveys []Survey
+	var surveys []types.Survey
 	for rows.Next() {
-		var survey Survey
+		var survey types.Survey
 		err := rows.Scan(&survey.SurveyID, &survey.Title)
 		if err != nil {
 			log.Fatal(err)
@@ -97,7 +97,7 @@ func surveyHandler(w http.ResponseWriter, r *http.Request) {
 	id := vars["id"]
 
 	// Fetch survey data from the database using survey ID
-	var survey Survey
+	var survey types.Survey
 
 	// Fetch survey data from the database
 	row := db.QueryRow("SELECT id, title FROM surveys WHERE id = ?", id)
@@ -118,7 +118,7 @@ func surveyHandler(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var question Question
+		var question types.Question
 		err := rows.Scan(&question.QuestionID, &question.Title)
 		if err != nil {
 			log.Fatal(err)
@@ -132,7 +132,7 @@ func surveyHandler(w http.ResponseWriter, r *http.Request) {
 		defer answerRows.Close()
 
 		for answerRows.Next() {
-			var answer Answer
+			var answer types.Answer
 			err := answerRows.Scan(&answer.AnswerID, &answer.Text, &answer.Value)
 			if err != nil {
 				log.Fatal(err)

@@ -283,9 +283,13 @@ func WaysOfCopingQuestionnaireHandler(s types.SurveyResults) []byte {
 	for questionID, answer := range s.Picked {
 		for field, keysMap := range scaleWCQKeys {
 			if keysMap[questionID] {
-				result[field] += ageAndSexResolver(s.Age, answer, s.Sex, field)
+				result[field] += answer
 			}
 		}
+	}
+	
+	for field, value := range result {
+		result[field] = ageAndSexResolver(s.Age, value, s.Sex, field)
 	}
 	
 	resultJSON, err := json.Marshal(result)

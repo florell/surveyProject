@@ -1,5 +1,9 @@
 package handlers
 
+import (
+	types "psychward/src"
+)
+
 var (
 	CohesionKeys = map[int]int{
 		1:  1,
@@ -112,8 +116,8 @@ var (
 	}
 )
 
-func FamilyEnvironmentalScaleHandler(s *main.SurveyResults) main.FamilyEnvironmentalScaleResponse {
-	result := main.FamilyEnvironmentalScaleResponse{}
+func FamilyEnvironmentalScaleHandler(s *types.SurveyResults) types.FamilyEnvironmentalScaleResponse {
+	result := types.FamilyEnvironmentalScaleResponse{}
 
 	for questionId, answer := range s.Picked {
 		if answer == CohesionKeys[questionId] {

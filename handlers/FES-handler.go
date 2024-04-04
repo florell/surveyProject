@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	CohesionKeys = map[int]int{
+	cohesionKeys = map[int]int{
 		1:  1,
 		11: 1,
 		21: 1,
@@ -16,7 +16,7 @@ var (
 		61: 0,
 		71: 0,
 	}
-	ExpressivenessKeys = map[int]int{
+	expressivenessKeys = map[int]int{
 		2:  1,
 		12: 1,
 		32: 1,
@@ -27,7 +27,7 @@ var (
 		82: 1,
 		22: 0,
 	}
-	ConflictKeys = map[int]int{
+	conflictKeys = map[int]int{
 		13: 1,
 		33: 1,
 		63: 1,
@@ -38,7 +38,7 @@ var (
 		43: 0,
 		53: 0,
 	}
-	IndependenceKeys = map[int]int{
+	independenceKeys = map[int]int{
 		4:  1,
 		14: 1,
 		44: 1,
@@ -49,7 +49,7 @@ var (
 		74: 0,
 		84: 0,
 	}
-	AchievementOrientationKeys = map[int]int{
+	achievementOrientationKeys = map[int]int{
 		5:  1,
 		15: 1,
 		35: 1,
@@ -60,7 +60,7 @@ var (
 		55: 0,
 		85: 0,
 	}
-	IntellectualCulturalOrientationKeys = map[int]int{
+	intellectualCulturalOrientationKeys = map[int]int{
 		6:  1,
 		26: 1,
 		56: 1,
@@ -70,7 +70,7 @@ var (
 		36: 0,
 		76: 0,
 	}
-	FocusOnActiveRecreationKeys = map[int]int{
+	focusOnActiveRecreationKeys = map[int]int{
 		17: 1,
 		37: 1,
 		47: 1,
@@ -81,7 +81,7 @@ var (
 		57: 0,
 		87: 0,
 	}
-	MoralAspectsKeys = map[int]int{
+	moralAspectsKeys = map[int]int{
 		8:  1,
 		28: 1,
 		58: 1,
@@ -92,7 +92,7 @@ var (
 		38: 0,
 		48: 0,
 	}
-	OrganizationKeys = map[int]int{
+	organizationKeys = map[int]int{
 		9:  1,
 		19: 1,
 		39: 1,
@@ -103,7 +103,7 @@ var (
 		49: 0,
 		79: 0,
 	}
-	ControlKeys = map[int]int{
+	controlKeys = map[int]int{
 		10: 1,
 		30: 1,
 		40: 1,
@@ -118,39 +118,39 @@ var (
 
 func FamilyEnvironmentalScaleHandler(s *types.SurveyResults) types.FamilyEnvironmentalScaleResponse {
 	result := types.FamilyEnvironmentalScaleResponse{}
-
+	
 	for questionId, answer := range s.Picked {
-		if answer == CohesionKeys[questionId] {
+		if answer == cohesionKeys[questionId] {
 			result.Cohesion++
 		}
-		if answer == ExpressivenessKeys[questionId] {
+		if answer == expressivenessKeys[questionId] {
 			result.Expressiveness++
 		}
-		if answer == ConflictKeys[questionId] {
+		if answer == conflictKeys[questionId] {
 			result.Conflict++
 		}
-		if answer == IndependenceKeys[questionId] {
+		if answer == independenceKeys[questionId] {
 			result.Independence++
 		}
-		if answer == AchievementOrientationKeys[questionId] {
+		if answer == achievementOrientationKeys[questionId] {
 			result.AchievementOrientation++
 		}
-		if answer == IntellectualCulturalOrientationKeys[questionId] {
+		if answer == intellectualCulturalOrientationKeys[questionId] {
 			result.IntellectualCulturalOrientation++
 		}
-		if answer == FocusOnActiveRecreationKeys[questionId] {
+		if answer == focusOnActiveRecreationKeys[questionId] {
 			result.FocusOnActiveRecreation++
 		}
-		if answer == MoralAspectsKeys[questionId] {
+		if answer == moralAspectsKeys[questionId] {
 			result.MoralAspects++
 		}
-		if answer == OrganizationKeys[questionId] {
+		if answer == organizationKeys[questionId] {
 			result.Organization++
 		}
-		if answer == ControlKeys[questionId] {
+		if answer == controlKeys[questionId] {
 			result.Control++
 		}
 	}
-
+	
 	return result
 }

@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	standartPoints = map[string]map[int][]int{
+	standardPoints = map[string]map[int][]int{
 		"Confrontation": {
 			0:  []int{22, 22, 15, 14, 16, 22, 17, 19},
 			1:  []int{26, 25, 19, 18, 20, 26, 21, 23},
@@ -266,13 +266,13 @@ func ageAndSexResolver(age, score int, sex, field string) int {
 	
 	switch {
 	case age <= 20:
-		return standartPoints[field][score][sexInt*4]
+		return standardPoints[field][score][sexInt*4]
 	case age >= 21 && age <= 30:
-		return standartPoints[field][score][1+sexInt*4]
+		return standardPoints[field][score][1+sexInt*4]
 	case age >= 31 && age <= 45:
-		return standartPoints[field][score][2+sexInt*4]
+		return standardPoints[field][score][2+sexInt*4]
 	default: // age >= 46
-		return standartPoints[field][score][3+sexInt*4]
+		return standardPoints[field][score][3+sexInt*4]
 	}
 }
 

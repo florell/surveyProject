@@ -276,7 +276,7 @@ func ageAndSexResolver(age, score int, sex, field string) int {
 	}
 }
 
-func WaysOfCopingQuestionnaireHandler(s types.SurveyResults) []byte {
+func WaysOfCopingQuestionnaireHandler(s *types.SurveyResults) []byte {
 	result := make(map[string]int)
 	
 	// answer: 0, 1, 2, 3

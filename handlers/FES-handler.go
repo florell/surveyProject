@@ -121,7 +121,7 @@ var (
 )
 
 // answer: 0 - No, 1 - Yes
-func FamilyEnvironmentalScaleHandler(s types.SurveyResults) []byte {
+func FamilyEnvironmentalScaleHandler(s *types.SurveyResults) []byte {
 	result := make(map[string]int)
 	
 	for questionID, answer := range s.Picked {

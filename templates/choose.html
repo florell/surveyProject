@@ -4,11 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Choose Survey</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+        }
+        .card {
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
 </head>
 <body>
-    <h1>Choose a survey:</h1>
-    {{range .}}
-    <a href="/survey/{{.SurveyID}}">{{.Title}}</a><br>
-    {{end}}
+    <div class="container">
+        <h1 class="text-center mb-4">Choose a survey:</h1>
+        <div class="row">
+            {{range .}}
+            <div class="col-md-6 mb-4">
+                <a href="/survey/{{.SurveyID}}" class="card text-center p-4">
+                    <h5 class="card-title">{{.Title}}</h5>
+                    <p class="card-text">Description of the survey goes here.</p>
+                </a>
+            </div>
+            {{end}}
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (optional if you need Bootstrap JavaScript functionality) -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

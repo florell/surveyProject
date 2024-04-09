@@ -12,12 +12,13 @@
         {{ range $index, $question := .Questions }}
             <h2>{{ $question.Title }}</h2>
             {{ range $answerIndex, $answer := $question.Answers }}
-                <input type="radio" id="question{{ $question.QuestionID }}_answer{{ $answer.AnswerID }}" name="question{{ $question.QuestionID }}" value="{{ $answer.AnswerID }}">
+                <input type="radio" id="question{{ $question.QuestionID }}_answer{{ $answer.AnswerID }}" name="question{{ $question.QuestionID }}" value="{{ $answer.Value }}">
                 <label for="question{{ $question.QuestionID }}_answer{{ $answer.AnswerID }}">{{ $answer.Text }}</label><br>
             {{ end }}
             <br>
         {{ end }}
         <input type="submit" value="Submit">
     </form>
+    
 </body>
 </html>

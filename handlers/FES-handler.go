@@ -126,7 +126,7 @@ func FamilyEnvironmentalScaleHandler(s *types.SurveyResults) []byte {
 	
 	for questionID, answer := range s.Picked {
 		for field, keysMap := range scaleFESKeys {
-			if answer == keysMap[questionID] {
+			if key, ok := keysMap[questionID]; ok && answer == key {
 				result[field]++
 			}
 		}

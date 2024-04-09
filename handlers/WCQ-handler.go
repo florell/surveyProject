@@ -282,7 +282,7 @@ func WaysOfCopingQuestionnaireHandler(s *types.SurveyResults) []byte {
 	// answer: 0, 1, 2, 3
 	for questionID, answer := range s.Picked {
 		for field, keysMap := range scaleWCQKeys {
-			if keysMap[questionID] {
+			if value, ok := keysMap[questionID]; ok && value {
 				result[field] += answer
 			}
 		}

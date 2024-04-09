@@ -7,7 +7,9 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	handlers "psychward/handlers"
 	types "psychward/src"
+	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -191,13 +193,37 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Extract survey answers from form
-	surveyID := r.FormValue("survey_id")
-	answers := r.Form["answers"]
-
-	// Convert answers to JSON format
-	answersJSON, err := json.Marshal(answers)
+	surveyIDstr := r.FormValue("survey_id")
+	surveyID, err := strconv.Atoi(surveyIDstr)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Invalid survey ID", http.StatusBadRequest)
+		return
+	}
+	answers := r.Form["answers[]"]
+	fmt.Println(answers)
+
+	picked := make(map[int]int)
+	for _, ans := range answers {
+		// Convert answer to integer
+		// Assuming the answer format is questionID:optionID
+		// Split the answer string to get questionID and optionID
+		// Convert them to integers
+		// Store them in the picked map
+		// Example: "1:2" means question 1, option 2
+		var questionID, optionID int
+		fmt.Sscanf(ans, "%d:%d", &questionID, &optionID)
+		picked[questionID] = optionID
+	}
+
+	surveyResults := types.SurveyResults{
+		SurveyID:  surveyID,
+		PatientID: int(patientID),
+		Picked:    picked,
+	}
+	fmt.Println(surveyResults.Picked)
+	analysis, err := json.Marshal(handlers.FamilyEnvironmentalScaleHandler(&surveyResults))
+	if err != nil {
+		fmt.Println("Error marshaling JSON:", err)
 		return
 	}
 
@@ -210,7 +236,7 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	defer stmt.Close()
 
 	// Execute the SQL statement
-	_, err = stmt.Exec(patientID, surveyID, string(answersJSON))
+	_, err = stmt.Exec(patientID, surveyID, string(analysis))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

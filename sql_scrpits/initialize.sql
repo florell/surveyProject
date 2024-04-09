@@ -1,3 +1,6 @@
+CREATE DATABASE IF NOT EXISTS psy_data;
+USE psy_data;
+
 -- Create Surveys table
 CREATE TABLE IF NOT EXISTS surveys (
     ID INT AUTO_INCREMENT PRIMARY KEY,

@@ -10,6 +10,7 @@ import (
 	handlers "psychward/handlers"
 	types "psychward/src"
 	"strconv"
+	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -40,7 +41,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		surname := r.FormValue("surname")
 
 		// Prepare SQL statement
-		stmt, err := db.Prepare("INSERT INTO patients (name, surname) VALUES (?, ?)")
+		stmt, err := db.Prepare("INSERT IGNORE patients (name, surname) VALUES (?, ?)")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -153,9 +154,10 @@ func surveyHandler(w http.ResponseWriter, r *http.Request) {
 	// w.Header().Set("Content-Type", "application/json")
 	// w.Write(data)
 
-	tmpl, err := template.ParseFiles("templates/survey.html")
+	tmpl := template.Must(template.ParseFiles("templates/survey.html"))
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("Error parsing template:", err)
+		return
 	}
 
 	// Execute the template with survey data
@@ -199,26 +201,37 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid survey ID", http.StatusBadRequest)
 		return
 	}
-	answers := r.Form["answers[]"]
-	fmt.Println(answers)
 
-	picked := make(map[int]int)
-	for _, ans := range answers {
-		// Convert answer to integer
-		// Assuming the answer format is questionID:optionID
-		// Split the answer string to get questionID and optionID
-		// Convert them to integers
-		// Store them in the picked map
-		// Example: "1:2" means question 1, option 2
-		var questionID, optionID int
-		fmt.Sscanf(ans, "%d:%d", &questionID, &optionID)
-		picked[questionID] = optionID
+	selectedAnswers := make(map[int]int)
+	for key, values := range r.Form {
+		fmt.Println(key, values)
+		if strings.HasPrefix(key, "question") {
+			// Extract question number and answer ID
+			questionID := strings.Split(key, "question")[1]
+			fmt.Println(questionID)
+			for _, value := range values {
+				qIDint, ok := strconv.Atoi(questionID)
+				if ok != nil {
+					log.Println(ok)
+				}
+				intValue, ok := strconv.Atoi(value)
+				if ok != nil {
+					log.Println(ok)
+				}
+				selectedAnswers[qIDint] = intValue
+			}
+		}
+	}
+
+	fmt.Println("Selected Answers:")
+	for questionID, answerID := range selectedAnswers {
+		fmt.Printf("Question %d: Answer %d\n", questionID, answerID)
 	}
 
 	surveyResults := types.SurveyResults{
 		SurveyID:  surveyID,
 		PatientID: int(patientID),
-		Picked:    picked,
+		Picked:    selectedAnswers,
 	}
 	fmt.Println(surveyResults.Picked)
 	analysis, err := json.Marshal(handlers.FamilyEnvironmentalScaleHandler(&surveyResults))

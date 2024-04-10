@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Choose Survey</title>
+    <title>Выбор опроса</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -24,13 +24,13 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="text-center mb-4">Choose a survey:</h1>
+        <h1 class="text-center mb-4">Выберите опрос:</h1>
         <div class="row">
             {{range .}}
             <div class="col-md-6 mb-4">
                 <a href="/survey/{{.SurveyID}}" class="card text-center p-4">
                     <h5 class="card-title">{{.Title}}</h5>
-                    <p class="card-text">Description of the survey goes here.</p>
+                    <p class="card-text">{{.Description}}</p>
                 </a>
             </div>
             {{end}}

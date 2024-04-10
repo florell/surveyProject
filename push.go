@@ -25,7 +25,7 @@ func FilePathWalkDir(root string) ([]string, error) {
 }
 
 func pushTest(db *sql.DB) {
-	files, err := FilePathWalkDir("json_tests")
+	files, err := FilePathWalkDir("surveys")
 	if err != nil {
 		log.Fatalln(err)
 	}

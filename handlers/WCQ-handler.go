@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	types "psychward/src"
+	"strings"
 )
 
 var (
@@ -255,10 +256,10 @@ var (
 
 func ageAndSexResolver(age, score int, sex, field string) int {
 	var sexInt int
-	switch sex {
-	case "man":
+	switch strings.ToLower(sex) {
+	case "male":
 		sexInt = 1
-	case "woman":
+	case "female":
 		sexInt = 0
 	default:
 		log.Fatalln("'sex' can be only 'man' or 'woman'")

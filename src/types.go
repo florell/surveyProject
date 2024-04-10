@@ -22,7 +22,7 @@ type SurveyResults struct {
 	SurveyID  int
 	PatientID int
 	Age       int
-	Sex       string // 'Man' or 'Woman'
+	Sex       string // 'Male' or 'Female'
 	Picked    map[int]int
 }
 

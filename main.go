@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -234,7 +233,8 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		Picked:    selectedAnswers,
 	}
 	fmt.Println(surveyResults.Picked)
-	analysis, err := json.Marshal(handlers.FamilyEnvironmentalScaleHandler(&surveyResults))
+	analysis := handlers.FamilyEnvironmentalScaleHandler(&surveyResults)
+	fmt.Println(analysis)
 	if err != nil {
 		fmt.Println("Error marshaling JSON:", err)
 		return
@@ -281,5 +281,8 @@ func main() {
 	http.Handle("/", r)
 
 	fmt.Println("Server is running on port 8080...")
-	http.ListenAndServe(":8080", nil)
+	err = http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }

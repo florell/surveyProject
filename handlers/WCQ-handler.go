@@ -256,14 +256,14 @@ var (
 func ageAndSexResolver(age, score int, sex, field string) int {
 	var sexInt int
 	switch sex {
-	case "man":
+	case "male":
 		sexInt = 1
-	case "woman":
+	case "female":
 		sexInt = 0
 	default:
-		log.Fatalln("'sex' can be only 'man' or 'woman'")
+		log.Fatalln("'sex' can be only 'male' or 'female'")
 	}
-	
+
 	switch {
 	case age <= 20:
 		return standardPoints[field][score][sexInt*4]
@@ -278,7 +278,7 @@ func ageAndSexResolver(age, score int, sex, field string) int {
 
 func WaysOfCopingQuestionnaireHandler(s *types.SurveyResults) []byte {
 	result := make(map[string]int)
-	
+
 	// answer: 0, 1, 2, 3
 	for questionID, answer := range s.Picked {
 		for field, keysMap := range scaleWCQKeys {
@@ -287,11 +287,11 @@ func WaysOfCopingQuestionnaireHandler(s *types.SurveyResults) []byte {
 			}
 		}
 	}
-	
+
 	for field, value := range result {
 		result[field] = ageAndSexResolver(s.Age, value, s.Sex, field)
 	}
-	
+
 	resultJSON, err := json.Marshal(result)
 	if err != nil {
 		log.Fatalln(err)

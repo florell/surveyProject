@@ -63,6 +63,11 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		fmt.Printf("!!!!!!!!! %T %v %T %v", sex, sex, age, age)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
 		session.Values["patientID"] = insertedID
 		session.Values["patientGender"] = sex
 		session.Values["patientAge"] = age
@@ -192,6 +197,21 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	patientGender, ok := session.Values["patientGender"].(string)
+	if !ok {
+		http.Error(w, "Patient gender not found in this session", http.StatusInternalServerError)
+	}
+
+	patientAge, ok := session.Values["patientAge"].(string)
+	fmt.Println("!!#!#!@#!@#!@#", patientAge)
+	if !ok {
+		http.Error(w, "Patient age not found in this session", http.StatusInternalServerError)
+	}
+	patientAgeInt, err := strconv.Atoi(patientAge)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	// Parse form data
 	err = r.ParseForm()
 	if err != nil {
@@ -236,14 +256,21 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	surveyResults := types.SurveyResults{
 		SurveyID:  surveyID,
 		PatientID: int(patientID),
+		Age:       patientAgeInt,
+		Sex:       patientGender,
 		Picked:    selectedAnswers,
 	}
 	fmt.Println(surveyResults.Picked)
-	analysis := handlers.FamilyEnvironmentalScaleHandler(&surveyResults)
-	fmt.Println(analysis)
-	if err != nil {
-		fmt.Println("Error marshaling JSON:", err)
-		return
+	fmt.Println(surveyResults.Age)
+	fmt.Println(surveyResults.Sex)
+
+	var analysis []byte
+	switch surveyID {
+	case 1:
+		analysis = handlers.FamilyEnvironmentalScaleHandler(&surveyResults)
+	case 2:
+		analysis = handlers.WaysOfCopingQuestionnaireHandler(&surveyResults)
+		fmt.Println("!!!!", string(analysis))
 	}
 
 	// Prepare SQL statement

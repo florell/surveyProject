@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"html/template"
 	"log"
@@ -11,7 +12,7 @@ import (
 	types "psychward/src"
 	"strconv"
 	"strings"
-
+	
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -21,13 +22,13 @@ var db *sql.DB
 var store = sessions.NewCookieStore([]byte("merogrek"))
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-
+	
 	session, err := store.Get(r, "session-name")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
+	
 	if r.Method == http.MethodPost {
 		// Parse form data
 		err := r.ParseForm()
@@ -35,11 +36,11 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-
+		
 		// Extract name and surname from form
 		name := r.FormValue("name")
 		surname := r.FormValue("surname")
-
+		
 		// Prepare SQL statement
 		stmt, err := db.Prepare("INSERT IGNORE patients (name, surname) VALUES (?, ?)")
 		if err != nil {
@@ -47,32 +48,32 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer stmt.Close()
-
+		
 		// Execute the SQL statement
 		res, err := stmt.Exec(name, surname)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-
+		
 		insertedID, err := res.LastInsertId()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-
+		
 		session.Values["patientID"] = insertedID
 		session.Save(r, w)
-
+		
 		// Redirect after successful form submission
 		http.Redirect(w, r, "/choose", http.StatusSeeOther)
 		return
 	}
-
+	
 	// For GET request, serve the HTML form
 	tmpl := template.Must(template.ParseFiles("templates/index.html"))
 	tmpl.Execute(w, nil)
-
+	
 }
 func chooseHandler(w http.ResponseWriter, r *http.Request) {
 	// Fetch surveys from the database
@@ -90,7 +91,7 @@ func chooseHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		surveys = append(surveys, survey)
 	}
-
+	
 	tmpl := template.Must(template.ParseFiles("templates/choose.html"))
 	tmpl.Execute(w, surveys)
 }
@@ -98,10 +99,10 @@ func chooseHandler(w http.ResponseWriter, r *http.Request) {
 func surveyHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-
+	
 	// Fetch survey data from the database using survey ID
 	var survey types.Survey
-
+	
 	// Fetch survey data from the database
 	row := db.QueryRow("SELECT id, title FROM surveys WHERE id = ?", id)
 	err := row.Scan(&survey.SurveyID, &survey.Title)
@@ -112,28 +113,28 @@ func surveyHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Fatal(err)
 	}
-
+	
 	// Fetch questions and answers for the survey from the database
 	rows, err := db.Query("SELECT id, title FROM questions WHERE surveyid = ?", survey.SurveyID)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rows.Close()
-
+	
 	for rows.Next() {
 		var question types.Question
 		err := rows.Scan(&question.QuestionID, &question.Title)
 		if err != nil {
 			log.Fatal(err)
 		}
-
+		
 		// Fetch answers for each question
 		answerRows, err := db.Query("SELECT id, text, value FROM answers WHERE questionid = ?", question.QuestionID)
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer answerRows.Close()
-
+		
 		for answerRows.Next() {
 			var answer types.Answer
 			err := answerRows.Scan(&answer.AnswerID, &answer.Text, &answer.Value)
@@ -142,10 +143,10 @@ func surveyHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			question.Answers = append(question.Answers, answer)
 		}
-
+		
 		survey.Questions = append(survey.Questions, question)
 	}
-
+	
 	// Temporary solution
 	// data, err := json.Marshal(survey)
 	// if err != nil {
@@ -153,13 +154,13 @@ func surveyHandler(w http.ResponseWriter, r *http.Request) {
 	// }
 	// w.Header().Set("Content-Type", "application/json")
 	// w.Write(data)
-
+	
 	tmpl := template.Must(template.ParseFiles("templates/survey.html"))
 	if err != nil {
 		fmt.Println("Error parsing template:", err)
 		return
 	}
-
+	
 	// Execute the template with survey data
 	err = tmpl.Execute(w, survey)
 	if err != nil {
@@ -172,28 +173,28 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-
+	
 	// Retrieve the session
 	session, err := store.Get(r, "session-name")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
+	
 	// Check if the patientID exists in the session
 	patientID, ok := session.Values["patientID"].(int64)
 	if !ok {
 		http.Error(w, "Patient ID not found in session", http.StatusInternalServerError)
 		return
 	}
-
+	
 	// Parse form data
 	err = r.ParseForm()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
+	
 	// Extract survey answers from form
 	surveyIDstr := r.FormValue("survey_id")
 	surveyID, err := strconv.Atoi(surveyIDstr)
@@ -201,7 +202,7 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid survey ID", http.StatusBadRequest)
 		return
 	}
-
+	
 	selectedAnswers := make(map[int]int)
 	for key, values := range r.Form {
 		fmt.Println(key, values)
@@ -222,12 +223,12 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-
+	
 	fmt.Println("Selected Answers:")
 	for questionID, answerID := range selectedAnswers {
 		fmt.Printf("Question %d: Answer %d\n", questionID, answerID)
 	}
-
+	
 	surveyResults := types.SurveyResults{
 		SurveyID:  surveyID,
 		PatientID: int(patientID),
@@ -239,7 +240,7 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Error marshaling JSON:", err)
 		return
 	}
-
+	
 	// Prepare SQL statement
 	stmt, err := db.Prepare("INSERT INTO survey_results (PatientID, SurveyID, Result) VALUES (?, ?, ?)")
 	if err != nil {
@@ -247,14 +248,14 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer stmt.Close()
-
+	
 	// Execute the SQL statement
 	_, err = stmt.Exec(patientID, surveyID, string(analysis))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
+	
 	// Redirect after successful form submission
 	http.Redirect(w, r, "/thankyou", http.StatusSeeOther)
 }
@@ -271,6 +272,14 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.Close()
+	
+	pushFlag := flag.Bool("push", false, "Use this flag to enable push")
+	flag.Parse()
+	if *pushFlag {
+		pushTest(db)
+		return
+	}
+	
 	// pushTest(db)
 	r := mux.NewRouter()
 	r.HandleFunc("/", indexHandler)
@@ -279,7 +288,7 @@ func main() {
 	r.HandleFunc("/submit_survey", submitSurveyHandler)
 	r.HandleFunc("/thankyou", thankyouHandler)
 	http.Handle("/", r)
-
+	
 	fmt.Println("Server is running on port 8080...")
 	http.ListenAndServe(":8080", nil)
 }

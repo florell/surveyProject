@@ -13,9 +13,10 @@ type Question struct {
 }
 
 type Survey struct {
-	SurveyID  int
-	Title     string
-	Questions []Question
+	SurveyID    int
+	Title       string
+	Description string
+	Questions   []Question
 }
 
 type SurveyResults struct {

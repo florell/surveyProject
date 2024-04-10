@@ -4,7 +4,8 @@ USE psy_data;
 -- Create Surveys table
 CREATE TABLE IF NOT EXISTS surveys (
     ID INT AUTO_INCREMENT PRIMARY KEY,
-    Title VARCHAR(255)
+    Title VARCHAR(255),
+    Description VARCHAR(255)
 );
 
 -- Create Questions table
@@ -28,7 +29,9 @@ CREATE TABLE IF NOT EXISTS answers (
 CREATE TABLE IF NOT EXISTS patients (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(255),
-    Surname VARCHAR(255)
+    Surname VARCHAR(255),
+    Age INT,
+    Sex VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS survey_results (

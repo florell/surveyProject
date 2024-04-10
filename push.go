@@ -16,6 +16,7 @@ func pushTest(db *sql.DB) {
 	{
 		"ID": 1,
 		"Title": "Шкала семейных отношений",
+		"Description": "Тест поможет вам осознать и оценить качество ваших взаимоотношений в семье, предоставляя вам инсайты для улучшения семейной гармонии и понимания между членами семьи.",
 		"Questions": [
 			{
 				"Title": "Члены нашей семьи оказывают реальную помощь и поддержку друг другу.",
@@ -1198,8 +1199,8 @@ func pushTest(db *sql.DB) {
 	}
 
 	// Insert survey data into the database
-	insertSurveyQuery := "INSERT INTO surveys (id, title) VALUES (?, ?)"
-	res, err := db.Exec(insertSurveyQuery, survey.SurveyID, survey.Title)
+	insertSurveyQuery := "INSERT INTO surveys (id, title, description) VALUES (?, ?, ?)"
+	res, err := db.Exec(insertSurveyQuery, survey.SurveyID, survey.Title, survey.Description)
 	if err != nil {
 		log.Fatalf("Error inserting survey: %v", err)
 	}

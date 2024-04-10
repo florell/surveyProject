@@ -4,21 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Survey</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Custom styles */
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            padding-top: 20px;
+        }
+        .survey-container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 40px;
+            margin: auto;
+            max-width: 600px;
+        }
+        .survey-question {
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+        }
+        .survey-question label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .survey-answer {
+            margin-bottom: 15px;
+        }
+        .survey-submit {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .form-check-input[type="radio"] {
+            display: none;
+        }
+        .form-check-input[type="radio"] + .custom-radio:before {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: #fff;
+            border: 2px solid #007bff;
+            border-radius: 50%;
+            vertical-align: middle;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .form-check-input[type="radio"]:checked + .custom-radio:before {
+            background-color: #007bff;
+        }
+        .form-check-input[type="radio"]:disabled + .custom-radio:before {
+            background-color: #ccc;
+            border-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
-    <h1>{{ .Title }}</h1>
-    <form action="/submit_survey" method="post">
-        <input type="hidden" name="survey_id" value="{{ .SurveyID }}">
-        {{ range $index, $question := .Questions }}
-            <h2>{{ $question.Title }}</h2>
-            {{ range $answerIndex, $answer := $question.Answers }}
-                <input type="radio" id="question{{ $question.QuestionID }}_answer{{ $answer.AnswerID }}" name="question{{ $question.QuestionID }}" value="{{ $answer.Value }}">
-                <label for="question{{ $question.QuestionID }}_answer{{ $answer.AnswerID }}">{{ $answer.Text }}</label><br>
+    <div class="container survey-container">
+        <h1 class="text-center mb-4">{{ .Title }}</h1>
+        <form action="/submit_survey" method="post">
+            <input type="hidden" name="survey_id" value="{{ .SurveyID }}">
+            {{ range $index, $question := .Questions }}
+                <div class="survey-question">
+                    <label>{{ $question.Title }}</label>
+                    {{ range $answerIndex, $answer := $question.Answers }}
+                        <div class="survey-answer form-check">
+                            <input class="form-check-input" type="radio" id="question{{ $question.QuestionID }}_answer{{ $answer.AnswerID }}" name="question{{ $question.QuestionID }}" value="{{ $answer.Value }}">
+                            <label class="form-check-label custom-radio" for="question{{ $question.QuestionID }}_answer{{ $answer.AnswerID }}">{{ $answer.Text }}</label>
+                        </div>
+                    {{ end }}
+                </div>
             {{ end }}
-            <br>
-        {{ end }}
-        <input type="submit" value="Submit">
-    </form>
+            <div class="survey-submit">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+    </div>
     
+    <!-- Bootstrap JS (Optional, for certain components) -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -142,7 +142,7 @@ func FamilyEnvironmentalScaleHandler(s *types.SurveyResults) []byte {
 	
 	for questionID, answer := range s.Picked {
 		for field, keysMap := range scaleFESKeys {
-			if key, ok := keysMap[fmt.Sprintf("%d", questionID)]; ok && answer == key {
+			if key, ok := keysMap[fmt.Sprintf("%d", questionID)]; ok && answer == key && field != "max_value" {
 				result[field]["value"]++
 			}
 		}

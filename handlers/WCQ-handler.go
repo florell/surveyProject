@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	types "psychward/src"
 	"strings"
@@ -184,72 +185,80 @@ var (
 			21: []int{75, 75, 80, 73, 74, 72, 72, 70},
 		},
 	}
-	scaleWCQKeys = map[string]map[int]bool{
+	scaleWCQKeys = map[string]map[string]int{
 		"Confrontation": {
-			2:  true,
-			3:  true,
-			13: true,
-			21: true,
-			26: true,
-			37: true,
+			"max_value": 90,
+			"2":         1,
+			"3":         1,
+			"13":        1,
+			"21":        1,
+			"26":        1,
+			"37":        1,
 		},
 		"Distancing": {
-			8:  true,
-			9:  true,
-			11: true,
-			16: true,
-			32: true,
-			35: true,
+			"max_value": 90,
+			"8":         1,
+			"9":         1,
+			"11":        1,
+			"16":        1,
+			"32":        1,
+			"35":        1,
 		},
 		"SelfControl": {
-			6:  true,
-			10: true,
-			27: true,
-			34: true,
-			44: true,
-			49: true,
-			50: true,
+			"max_value": 90,
+			"6":         1,
+			"10":        1,
+			"27":        1,
+			"34":        1,
+			"44":        1,
+			"49":        1,
+			"50":        1,
 		},
 		"SearchSocialSupport": {
-			4:  true,
-			14: true,
-			17: true,
-			24: true,
-			33: true,
-			36: true,
+			"max_value": 90,
+			"4":         1,
+			"14":        1,
+			"17":        1,
+			"24":        1,
+			"33":        1,
+			"36":        1,
 		},
 		"TakingResponsibility": {
-			5:  true,
-			19: true,
-			22: true,
-			42: true,
+			"max_value": 90,
+			"5":         1,
+			"19":        1,
+			"22":        1,
+			"42":        1,
 		},
 		"EscapeAvoidance": {
-			7:  true,
-			12: true,
-			25: true,
-			31: true,
-			38: true,
-			41: true,
-			46: true,
-			47: true,
+			"max_value": 90,
+			"7":         1,
+			"12":        1,
+			"25":        1,
+			"31":        1,
+			"38":        1,
+			"41":        1,
+			"46":        1,
+			"47":        1,
 		},
 		"PlanningTheSolution": {
-			1:  true,
-			20: true,
-			30: true,
-			39: true,
-			40: true,
-			43: true,
+			"max_value": 90,
+			"1":         1,
+			"20":        1,
+			"30":        1,
+			"39":        1,
+			"40":        1,
+			"43":        1,
 		},
 		"PositiveRevaluation": {
-			15: true,
-			18: true,
-			23: true,
-			28: true,
-			29: true,
-			45: true,
-			48: true,
+			"max_value": 90,
+			"15":        1,
+			"18":        1,
+			"23":        1,
+			"28":        1,
+			"29":        1,
+			"45":        1,
+			"48":        1,
 		},
 	}
 )
@@ -278,19 +287,24 @@ func ageAndSexResolver(age, score int, sex, field string) int {
 }
 
 func WaysOfCopingQuestionnaireHandler(s *types.SurveyResults) []byte {
-	result := make(map[string]int)
+	result := make(map[string]map[string]int)
+	
+	for field, keysMap := range scaleWCQKeys {
+		result[field] = make(map[string]int)
+		result[field]["max_value"] = keysMap["max_value"]
+	}
 	
 	// answer: 0, 1, 2, 3
 	for questionID, answer := range s.Picked {
 		for field, keysMap := range scaleWCQKeys {
-			if value, ok := keysMap[questionID-90]; ok && value {
-				result[field] += answer
+			if value, ok := keysMap[fmt.Sprintf("%d", questionID-90)]; ok && value == 1 && field != "max_value" {
+				result[field]["value"] += answer
 			}
 		}
 	}
 	
-	for field, value := range result {
-		result[field] = ageAndSexResolver(s.Age, value, s.Sex, field)
+	for field, resMap := range result {
+		result[field]["value"] = ageAndSexResolver(s.Age, resMap["value"], s.Sex, field)
 	}
 	
 	resultJSON, err := json.Marshal(result)

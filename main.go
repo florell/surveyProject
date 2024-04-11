@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/base64"
 	"flag"
 	"fmt"
 	"html/template"
@@ -19,6 +20,15 @@ import (
 
 var db *sql.DB
 var store = sessions.NewCookieStore([]byte("merogrek"))
+
+func encodeBytes(data []byte) string {
+	return base64.StdEncoding.EncodeToString(data)
+}
+
+// Function to decode base64 to []byte
+func decodeBytes(encoded string) ([]byte, error) {
+	return base64.StdEncoding.DecodeString(encoded)
+}
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -268,10 +278,16 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	switch surveyID {
 	case 1:
 		analysis = handlers.FamilyEnvironmentalScaleHandler(&surveyResults)
+		encAnalysis := encodeBytes(analysis)
+		session.Values["FES"] = encAnalysis
+		fmt.Println("!!!@!@@!@!@!@@!", encAnalysis)
 	case 2:
 		analysis = handlers.WaysOfCopingQuestionnaireHandler(&surveyResults)
+		encAnalysis := encodeBytes(analysis)
+		session.Values["WCQ"] = encAnalysis
 		fmt.Println("!!!!", string(analysis))
 	}
+	session.Save(r, w)
 
 	// Prepare SQL statement
 	stmt, err := db.Prepare("INSERT INTO survey_results (PatientID, SurveyID, Result) VALUES (?, ?, ?)")
@@ -289,12 +305,57 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Redirect after successful form submission
-	http.Redirect(w, r, "/thankyou", http.StatusSeeOther)
+	http.Redirect(w, r, "/result?survey_id="+surveyIDstr, http.StatusSeeOther)
 }
 
-func thankyouHandler(w http.ResponseWriter, r *http.Request) {
-	// Render a thank you message
-	fmt.Fprintln(w, "Thank you for submitting the survey!")
+func resultHandler(w http.ResponseWriter, r *http.Request) {
+	surveyId := r.URL.Query().Get("survey_id")
+	session, err := store.Get(r, "session-name")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	var res string
+	var ok bool
+	resD := make([]byte, 0)
+
+	switch surveyId {
+	case "1":
+		res, ok = session.Values["FES"].(string)
+		if !ok {
+			http.Error(w, "FES result not found in this session", http.StatusInternalServerError)
+		}
+		resD, err = decodeBytes(res)
+		if err != nil {
+			log.Fatalln("Error decoding FES result")
+		}
+		fmt.Println(res)
+
+	case "2":
+		res, ok = session.Values["WCQ"].(string)
+		if !ok {
+			http.Error(w, "WCQ result not found in this session", http.StatusInternalServerError)
+		}
+		resD, err = decodeBytes(res)
+		if err != nil {
+			log.Fatalln("Error decoding WCQ result")
+		}
+		fmt.Println(res)
+	}
+
+	tmpl := template.Must(template.ParseFiles("templates/results.html"))
+	if err != nil {
+		fmt.Println("Error parsing template:", err)
+		return
+	}
+
+	fmt.Println(string(resD))
+
+	err = tmpl.Execute(w, string(resD))
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
 
 func main() {
@@ -318,7 +379,7 @@ func main() {
 	r.HandleFunc("/choose", chooseHandler)
 	r.HandleFunc("/survey/{id}", surveyHandler)
 	r.HandleFunc("/submit_survey", submitSurveyHandler)
-	r.HandleFunc("/thankyou", thankyouHandler)
+	r.HandleFunc("/result", resultHandler)
 	http.Handle("/", r)
 
 	fmt.Println("Server is running on port 8080...")

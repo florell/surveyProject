@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Progress Bars</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+        margin: 0;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+
+    .progress-bar-container {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 30px;
+        background-color: #f0f0f0;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .progress-bar-inner {
+        height: 100%;
+        text-align: center;
+        line-height: 30px;
+        color: #fff;
+        transition: width 0.5s ease;
+        background-color: hsl(var(--hue), 70%, 50%);
+    }
+
+    .progress-bar-label {
+        flex: 1;
+        text-align: left;
+        padding-bottom: 10px;
+    }
+
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Результаты</h1>
+    <div id="feature-progress" class="section"></div>
+</div>
+<div style="height: 30px;"></div>
+
+<div class="container">
+    <div id="progress-bars"></div>
+</div>
+
+<script>
+    // Function to fetch data from JSON file
+    function fetchData() {
+        fetch('{{.}}')
+            .then(response => response.json())
+            .then(data => renderProgressBars(data))
+            .catch(error => console.error('Error fetching data:', error));
+    }
+
+    // Function to render progress bars
+    function renderProgressBars(data) {
+        const featureProgressContainer = document.getElementById('feature-progress');
+        const progressBarContainer = document.getElementById('progress-bars');
+        
+        for (const key in data) {
+            if (data.hasOwnProperty(key)) {
+                const feature = data[key];
+                const progress = (feature.value / feature.max_value) * 100;
+                const hue = (progress / 100) * 120;
+                const progressBarHTML = `
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-label">${key}</div>
+                        <div class="progress-bar">
+                            <div class="progress-bar-inner" style="--hue: ${hue}; width: ${progress}%;">
+                                ${feature.value} / ${feature.max_value}
+                            </div>
+                        </div>
+                    </div>`;
+                if (key === 'Feature progress') {
+                    featureProgressContainer.innerHTML += progressBarHTML;
+                } else {
+                    progressBarContainer.innerHTML += progressBarHTML;
+                }
+            }
+        }
+    }
+
+    // Call the fetchData function when the page loads
+    window.onload = fetchData;
+</script>
+</body>
+</html>

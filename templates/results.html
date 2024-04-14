@@ -61,6 +61,7 @@
 <body>
 <div class="container">
     <h1>Результаты</h1>
+    <div id="surveyData" style="display: none;">{{.}}</div>
     <div id="feature-progress" class="section"></div>
 </div>
 <div style="height: 30px;"></div>
@@ -70,13 +71,9 @@
 </div>
 
 <script>
-    // Function to fetch data from JSON file
-    function fetchData() {
-        fetch('{{.}}')
-            .then(response => response.json())
-            .then(data => renderProgressBars(data))
-            .catch(error => console.error('Error fetching data:', error));
-    }
+    var surveyDataString = document.getElementById("surveyData").innerText;
+    var surveyDataObject = JSON.parse(surveyDataString);
+    console.log(surveyDataObject);
 
     // Function to render progress bars
     function renderProgressBars(data) {
@@ -107,7 +104,7 @@
     }
 
     // Call the fetchData function when the page loads
-    window.onload = fetchData;
+    window.onload = renderProgressBars(surveyDataObject);
 </script>
 </body>
 </html>

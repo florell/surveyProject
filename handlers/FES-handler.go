@@ -134,12 +134,12 @@ var (
 // answer: 0 - No, 1 - Yes
 func FamilyEnvironmentalScaleHandler(s *types.SurveyResults) []byte {
 	result := make(map[string]map[string]int)
-	
+
 	for field, keysMap := range scaleFESKeys {
 		result[field] = make(map[string]int)
 		result[field]["max_value"] = keysMap["max_value"]
 	}
-	
+
 	for questionID, answer := range s.Picked {
 		for field, keysMap := range scaleFESKeys {
 			if key, ok := keysMap[fmt.Sprintf("%d", questionID)]; ok && answer == key && field != "max_value" {
@@ -147,7 +147,7 @@ func FamilyEnvironmentalScaleHandler(s *types.SurveyResults) []byte {
 			}
 		}
 	}
-	
+
 	resultJSON, err := json.Marshal(result)
 	if err != nil {
 		log.Fatalln(err)

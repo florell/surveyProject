@@ -9,7 +9,7 @@ import (
 
 var (
 	scaleFESKeys = map[string]map[string]int{
-		"Cohesion": {
+		"Сплоченность": {
 			"max_value": 9,
 			"1":         1,
 			"11":        1,
@@ -21,7 +21,7 @@ var (
 			"61":        0,
 			"71":        0,
 		},
-		"Expressiveness": {
+		"Экспрессивность": {
 			"max_value": 9,
 			"2":         1,
 			"12":        1,
@@ -33,7 +33,7 @@ var (
 			"82":        1,
 			"22":        0,
 		},
-		"Conflict": {
+		"Конфликт": {
 			"max_value": 9,
 			"13":        1,
 			"33":        1,
@@ -45,7 +45,7 @@ var (
 			"43":        0,
 			"53":        0,
 		},
-		"Independence": {
+		"Независимость": {
 			"max_value": 9,
 			"4":         1,
 			"14":        1,
@@ -57,7 +57,7 @@ var (
 			"74":        0,
 			"84":        0,
 		},
-		"AchievementOrientation": {
+		"Ориентация на достижения": {
 			"max_value": 9,
 			"5":         1,
 			"15":        1,
@@ -69,7 +69,7 @@ var (
 			"55":        0,
 			"85":        0,
 		},
-		"IntellectualCulturalOrientation": {
+		"Интеллектуально-культурная ориентация": {
 			"max_value": 9,
 			"6":         1,
 			"26":        1,
@@ -80,7 +80,7 @@ var (
 			"36":        0,
 			"76":        0,
 		},
-		"FocusOnActiveRecreation": {
+		"Ориентация на активный отдых": {
 			"max_value": 9,
 			"17":        1,
 			"37":        1,
@@ -92,7 +92,7 @@ var (
 			"57":        0,
 			"87":        0,
 		},
-		"MoralAspects": {
+		"Морально-нравственные аспекты": {
 			"max_value": 9,
 			"8":         1,
 			"28":        1,
@@ -104,7 +104,7 @@ var (
 			"38":        0,
 			"48":        0,
 		},
-		"Organization": {
+		"Организация": {
 			"max_value": 9,
 			"9":         1,
 			"19":        1,
@@ -116,7 +116,7 @@ var (
 			"49":        0,
 			"79":        0,
 		},
-		"Control": {
+		"Контроль": {
 			"max_value": 9,
 			"10":        1,
 			"30":        1,
@@ -134,12 +134,12 @@ var (
 // answer: 0 - No, 1 - Yes
 func FamilyEnvironmentalScaleHandler(s *types.SurveyResults) []byte {
 	result := make(map[string]map[string]int)
-
+	
 	for field, keysMap := range scaleFESKeys {
 		result[field] = make(map[string]int)
 		result[field]["max_value"] = keysMap["max_value"]
 	}
-
+	
 	for questionID, answer := range s.Picked {
 		for field, keysMap := range scaleFESKeys {
 			if key, ok := keysMap[fmt.Sprintf("%d", questionID)]; ok && answer == key && field != "max_value" {
@@ -147,7 +147,7 @@ func FamilyEnvironmentalScaleHandler(s *types.SurveyResults) []byte {
 			}
 		}
 	}
-
+	
 	resultJSON, err := json.Marshal(result)
 	if err != nil {
 		log.Fatalln(err)

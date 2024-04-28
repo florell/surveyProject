@@ -286,7 +286,7 @@ func ageAndSexResolver(age, score int, sex, field string) int {
 	}
 }
 
-func WaysOfCopingQuestionnaireHandler(s *types.SurveyResults) []byte {
+func WCQHandler(s *types.SurveyResults) []byte {
 	result := make(map[string]map[string]int)
 	
 	for field, keysMap := range scaleWCQKeys {

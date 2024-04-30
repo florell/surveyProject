@@ -2,13 +2,13 @@ package main
 
 import (
 	"database/sql"
-	"encoding/base64"
+	"errors"
 	"flag"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
-	handlers "psychward/handlers"
+	"psychward/handlers"
 	types "psychward/src"
 	"strconv"
 	"strings"
@@ -21,15 +21,6 @@ import (
 var db *sql.DB
 
 var store = sessions.NewCookieStore([]byte("merogrek"))
-
-func encodeBytes(data []byte) string {
-	return base64.StdEncoding.EncodeToString(data)
-}
-
-// Function to decode base64 to []byte
-func decodeBytes(encoded string) ([]byte, error) {
-	return base64.StdEncoding.DecodeString(encoded)
-}
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	session, err := store.Get(r, "session-name")
@@ -144,7 +135,7 @@ func surveyHandler(w http.ResponseWriter, r *http.Request) {
 	row := db.QueryRow("SELECT id, title FROM surveys WHERE id = ?", id)
 	err := row.Scan(&survey.SurveyID, &survey.Title)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			http.NotFound(w, r)
 			return
 		}
@@ -191,14 +182,6 @@ func surveyHandler(w http.ResponseWriter, r *http.Request) {
 		
 		survey.Questions = append(survey.Questions, question)
 	}
-	
-	// Temporary solution
-	// data, err := json.Marshal(survey)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// w.Header().Set("Content-Type", "application/json")
-	// w.Write(data)
 	
 	tmpl := template.Must(template.ParseFiles("templates/survey.html"))
 	if err != nil {
@@ -256,8 +239,7 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	// Extract survey answers from form
-	surveyIDstr := r.FormValue("survey_id")
-	surveyID, err := strconv.Atoi(surveyIDstr)
+	surveyID, err := strconv.Atoi(r.FormValue("survey_id"))
 	if err != nil {
 		http.Error(w, "Invalid survey ID", http.StatusBadRequest)
 		return
@@ -294,24 +276,18 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	switch surveyID {
 	case 1:
 		analysis = handlers.FESHandler(&surveyResults)
-		//encAnalysis := encodeBytes(analysis)
-		//session.Values["FES"] = encAnalysis
 	case 2:
 		analysis = handlers.WCQHandler(&surveyResults)
-		//encAnalysis := encodeBytes(analysis)
-		//session.Values["WCQ"] = encAnalysis
 	case 3:
 		analysis = handlers.VOZHandler(&surveyResults)
-		//encAnalysis := encodeBytes(analysis)
-		//session.Values["VOZ"] = encAnalysis
 	case 4:
 		analysis = handlers.BDIHandler(&surveyResults)
-		//encAnalysis := encodeBytes(analysis)
-		//session.Values["BDI"] = encAnalysis
 	case 5:
 		analysis = handlers.ITTHandler(&surveyResults)
-		//encAnalysis := encodeBytes(analysis)
-		//session.Values["ITT"] = encAnalysis
+	default:
+		log.Println("Survey ID is not supported:", surveyID)
+		http.Error(w, fmt.Sprintf("Survey ID is not supported: %s", surveyID), http.StatusBadRequest)
+		return
 	}
 	err = session.Save(r, w)
 	if err != nil {
@@ -349,47 +325,17 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 
 func resultHandler(w http.ResponseWriter, r *http.Request) {
 	resultId := r.URL.Query().Get("result_id")
-	//surveyId := r.URL.Query().Get("survey_id")
-	//session, err := store.Get(r, "session-name")
-	//if err != nil {
-	//	log.Println("Error getting session:", err)
-	//	return
-	//}
-	
-	//surveyName := "{surveyName}"
-	//switch surveyId {
-	//case "1":
-	//	surveyName = "FES"
-	//case "2":
-	//	surveyName = "WCQ"
-	//case "3":
-	//	surveyName = "VOZ"
-	//case "4":
-	//	surveyName = "BDI"
-	//case "5":
-	//	surveyName = "ITT"
-	//}
 	
 	var resD string
 	if err := db.QueryRow("SELECT Result FROM survey_results WHERE ID = ?", resultId).Scan(&resD); err != nil {
 		http.Error(w, fmt.Sprintf("Error getting results from database: %s", err.Error()), http.StatusInternalServerError)
 	}
 	
-	//res, ok := session.Values[surveyName].(string)
-	//if !ok {
-	//	http.Error(w, fmt.Sprintf("%s result not found in this session", surveyName), http.StatusInternalServerError)
-	//}
-	//resD, err := decodeBytes(res)
-	//if err != nil {
-	//	fmt.Println(res)
-	//	log.Fatalln(fmt.Sprintf("Error decoding %s result:", surveyName), err)
-	//}
-	
 	tmpl := template.Must(template.ParseFiles("templates/results.html"))
 	
-	fmt.Println("___", string(resD), "___")
+	fmt.Println("___", resD, "___")
 	
-	if err := tmpl.Execute(w, string(resD)); err != nil {
+	if err := tmpl.Execute(w, resD); err != nil {
 		log.Fatal(err)
 	}
 	

@@ -33,7 +33,7 @@ func VOZHandler(s *types.SurveyResults) []byte {
 	result.PhyslogHealth.Percent = ((float64(result.PhyslogHealth.Value) - 6) / 24) * 100
 	
 	result.SocialHealth.MaxValue = 15
-	result.SocialHealth.Value = s.Picked[21] + s.Picked[22+90+50] + s.Picked[23+90+50]
+	result.SocialHealth.Value = s.Picked[21+90+50] + s.Picked[22+90+50] + s.Picked[23+90+50]
 	result.SocialHealth.Percent = ((float64(result.SocialHealth.Value) - 3) / 12) * 100
 	
 	result.Environment.MaxValue = 40

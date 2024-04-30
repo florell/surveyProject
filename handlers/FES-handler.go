@@ -132,7 +132,7 @@ var (
 )
 
 // answer: 0 - No, 1 - Yes
-func FamilyEnvironmentalScaleHandler(s *types.SurveyResults) []byte {
+func FESHandler(s *types.SurveyResults) []byte {
 	result := make(map[string]map[string]int)
 	
 	for field, keysMap := range scaleFESKeys {

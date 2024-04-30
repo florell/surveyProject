@@ -19,6 +19,7 @@ import (
 )
 
 var db *sql.DB
+
 var store = sessions.NewCookieStore([]byte("merogrek"))
 
 func encodeBytes(data []byte) string {
@@ -31,10 +32,10 @@ func decodeBytes(encoded string) ([]byte, error) {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	
 	session, err := store.Get(r, "session-name")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Println("Error getting session:", err)
 		return
 	}
 	
@@ -58,7 +59,12 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		defer stmt.Close()
+		defer func(stmt *sql.Stmt) {
+			err := stmt.Close()
+			if err != nil {
+				log.Println(err)
+			}
+		}(stmt)
 		
 		// Execute the SQL statement
 		res, err := stmt.Exec(name, surname, sex, age)
@@ -78,7 +84,11 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		session.Values["patientID"] = insertedID
 		session.Values["patientGender"] = sex
 		session.Values["patientAge"] = age
-		session.Save(r, w)
+		
+		if err := session.Save(r, w); err != nil {
+			log.Println("Error saving cookies:", err)
+			return
+		}
 		
 		// Redirect after successful form submission
 		http.Redirect(w, r, "/choose", http.StatusSeeOther)
@@ -87,8 +97,10 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	
 	// For GET request, serve the HTML form
 	tmpl := template.Must(template.ParseFiles("templates/index.html"))
-	tmpl.Execute(w, nil)
-	
+	if err := tmpl.Execute(w, nil); err != nil {
+		log.Println(err)
+		return
+	}
 }
 
 func chooseHandler(w http.ResponseWriter, r *http.Request) {
@@ -97,7 +109,12 @@ func chooseHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer rows.Close()
+	defer func(rows *sql.Rows) {
+		if err := rows.Close(); err != nil {
+			log.Println(err)
+		}
+	}(rows)
+	
 	var surveys []types.Survey
 	for rows.Next() {
 		var survey types.Survey
@@ -109,7 +126,11 @@ func chooseHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	tmpl := template.Must(template.ParseFiles("templates/choose.html"))
-	tmpl.Execute(w, surveys)
+	
+	if err := tmpl.Execute(w, surveys); err != nil {
+		log.Println(err)
+		return
+	}
 }
 
 func surveyHandler(w http.ResponseWriter, r *http.Request) {
@@ -135,7 +156,11 @@ func surveyHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer rows.Close()
+	defer func(rows *sql.Rows) {
+		if err := rows.Close(); err != nil {
+			log.Println(err)
+		}
+	}(rows)
 	
 	for rows.Next() {
 		var question types.Question
@@ -149,7 +174,11 @@ func surveyHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer answerRows.Close()
+		defer func(answerRows *sql.Rows) {
+			if err := answerRows.Close(); err != nil {
+				log.Println(err)
+			}
+		}(answerRows)
 		
 		for answerRows.Next() {
 			var answer types.Answer
@@ -194,6 +223,7 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	session, err := store.Get(r, "session-name")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Println("Error getting session:", err)
 		return
 	}
 	
@@ -252,11 +282,6 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	
-	//fmt.Println("Selected Answers:")
-	//for questionID, answerID := range selectedAnswers {
-	//	fmt.Printf("Question %d: Answer %d\n", questionID, answerID)
-	//}
-	
 	surveyResults := types.SurveyResults{
 		SurveyID:  surveyID,
 		PatientID: int(patientID),
@@ -264,34 +289,29 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		Sex:       patientGender,
 		Picked:    selectedAnswers,
 	}
-	//fmt.Println(surveyResults.Picked)
-	//fmt.Println(surveyResults.Age)
-	//fmt.Println(surveyResults.Sex)
 	
 	var analysis []byte
 	switch surveyID {
 	case 1:
 		analysis = handlers.FESHandler(&surveyResults)
-		encAnalysis := encodeBytes(analysis)
-		session.Values["FES"] = encAnalysis
-		//fmt.Println("!!!@!@@!@!@!@@!", encAnalysis)
+		//encAnalysis := encodeBytes(analysis)
+		//session.Values["FES"] = encAnalysis
 	case 2:
 		analysis = handlers.WCQHandler(&surveyResults)
-		encAnalysis := encodeBytes(analysis)
-		session.Values["WCQ"] = encAnalysis
-		//fmt.Println("!!!!", string(analysis))
+		//encAnalysis := encodeBytes(analysis)
+		//session.Values["WCQ"] = encAnalysis
 	case 3:
 		analysis = handlers.VOZHandler(&surveyResults)
-		encAnalysis := encodeBytes(analysis)
-		session.Values["VOZ"] = encAnalysis
+		//encAnalysis := encodeBytes(analysis)
+		//session.Values["VOZ"] = encAnalysis
 	case 4:
 		analysis = handlers.BDIHandler(&surveyResults)
-		encAnalysis := encodeBytes(analysis)
-		session.Values["BDI"] = encAnalysis
+		//encAnalysis := encodeBytes(analysis)
+		//session.Values["BDI"] = encAnalysis
 	case 5:
 		analysis = handlers.ITTHandler(&surveyResults)
-		encAnalysis := encodeBytes(analysis)
-		session.Values["ITT"] = encAnalysis
+		//encAnalysis := encodeBytes(analysis)
+		//session.Values["ITT"] = encAnalysis
 	}
 	err = session.Save(r, w)
 	if err != nil {
@@ -304,7 +324,11 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer stmt.Close()
+	defer func(stmt *sql.Stmt) {
+		if err := stmt.Close(); err != nil {
+			log.Println(err)
+		}
+	}(stmt)
 	
 	// Execute the SQL statement
 	_, err = stmt.Exec(patientID, surveyID, string(analysis))
@@ -313,55 +337,59 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	// Redirect after successful form submission
-	http.Redirect(w, r, "/result?survey_id="+surveyIDstr, http.StatusSeeOther)
-}
-
-func resultHandler(w http.ResponseWriter, r *http.Request) {
-	surveyId := r.URL.Query().Get("survey_id")
-	session, err := store.Get(r, "session-name")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	
-	var res string
-	var ok bool
-	resD := make([]byte, 0)
-	
-	surveyName := "{surveyName}"
-	switch surveyId {
-	case "1":
-		surveyName = "FES"
-	case "2":
-		surveyName = "WCQ"
-	case "3":
-		surveyName = "VOZ"
-	case "4":
-		surveyName = "BDI"
-	case "5":
-		surveyName = "ITT"
-	}
-	
-	res, ok = session.Values[surveyName].(string)
-	if !ok {
-		http.Error(w, fmt.Sprintf("%s result not found in this session", surveyName), http.StatusInternalServerError)
-	}
-	resD, err = decodeBytes(res)
-	if err != nil {
-		log.Fatalln(fmt.Sprintf("Error decoding %s result", surveyName))
-	}
-	//fmt.Println(res)
-	
-	tmpl := template.Must(template.ParseFiles("templates/results.html"))
-	if err != nil {
-		log.Println("Error parsing template:", err)
+	var resultID string
+	if err := db.QueryRow("SELECT LAST_INSERT_ID()").Scan(&resultID); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	
+	// Redirect after successful form submission
+	http.Redirect(w, r, "/result?survey_id="+strconv.Itoa(surveyID)+"&result_id="+resultID, http.StatusSeeOther)
+}
+
+func resultHandler(w http.ResponseWriter, r *http.Request) {
+	resultId := r.URL.Query().Get("result_id")
+	//surveyId := r.URL.Query().Get("survey_id")
+	//session, err := store.Get(r, "session-name")
+	//if err != nil {
+	//	log.Println("Error getting session:", err)
+	//	return
+	//}
+	
+	//surveyName := "{surveyName}"
+	//switch surveyId {
+	//case "1":
+	//	surveyName = "FES"
+	//case "2":
+	//	surveyName = "WCQ"
+	//case "3":
+	//	surveyName = "VOZ"
+	//case "4":
+	//	surveyName = "BDI"
+	//case "5":
+	//	surveyName = "ITT"
+	//}
+	
+	var resD string
+	if err := db.QueryRow("SELECT Result FROM survey_results WHERE ID = ?", resultId).Scan(&resD); err != nil {
+		http.Error(w, fmt.Sprintf("Error getting results from database: %s", err.Error()), http.StatusInternalServerError)
+	}
+	
+	//res, ok := session.Values[surveyName].(string)
+	//if !ok {
+	//	http.Error(w, fmt.Sprintf("%s result not found in this session", surveyName), http.StatusInternalServerError)
+	//}
+	//resD, err := decodeBytes(res)
+	//if err != nil {
+	//	fmt.Println(res)
+	//	log.Fatalln(fmt.Sprintf("Error decoding %s result:", surveyName), err)
+	//}
+	
+	tmpl := template.Must(template.ParseFiles("templates/results.html"))
+	
 	fmt.Println("___", string(resD), "___")
 	
-	err = tmpl.Execute(w, string(resD))
-	if err != nil {
+	if err := tmpl.Execute(w, string(resD)); err != nil {
 		log.Fatal(err)
 	}
 	
@@ -373,7 +401,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.Close()
+	defer func(db *sql.DB) {
+		if err := db.Close(); err != nil {
+			log.Println(err)
+		}
+	}(db)
 	
 	pushFlag := flag.Bool("push", false, "Use this flag to push")
 	flag.Parse()

@@ -284,6 +284,8 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		analysis = handlers.BDIHandler(&surveyResults)
 	case 5:
 		analysis = handlers.ITTHandler(&surveyResults)
+	case 6:
+		analysis = handlers.MLOHandler(&surveyResults)
 	default:
 		log.Println("Survey ID is not supported:", surveyID)
 		http.Error(w, fmt.Sprintf("Survey ID is not supported: %s", surveyID), http.StatusBadRequest)

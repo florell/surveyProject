@@ -67,10 +67,14 @@ func getValue(yes []int, no []int, s *types.SurveyResults) int {
 	result := 0
 	
 	for _, value := range yes {
-		result += s.Picked[value+90+50+26+21+30]
+		if s.Picked[value+90+50+26+21+30] == 1 {
+			result++
+		}
 	}
 	for _, value := range no {
-		result -= s.Picked[value+90+50+26+21+30]
+		if s.Picked[value+90+50+26+21+30] == -1 {
+			result--
+		}
 	}
 	
 	return result
@@ -85,13 +89,15 @@ func getCorrection(score int, correction string) int {
 }
 
 func getCode(result *MLOResult) string {
-	v := reflect.ValueOf(&result).Elem()
+	//t := reflect.TypeOf(result)
+	
+	v := reflect.ValueOf(*result)
 	
 	fieldsDigits := make([]MLOField, 0)
 	fieldsWords := make([]MLOField, 0)
 	
-	for i := 0; i < v.NumField(); i++ {
-		field := v.Field(i).Addr().Interface().(MLOField)
+	for i := 1; i < v.NumField(); i++ {
+		field := v.Field(i).Interface().(MLOField)
 		if field.name == field.num {
 			fieldsWords = append(fieldsWords, field)
 		} else {
@@ -143,13 +149,14 @@ func getCode(result *MLOResult) string {
 	code := ""
 	for i := 0; i < len(fieldsDigits); i++ {
 		code += fieldsDigits[i].num
-		if fieldsDigits[i].TScore > fieldsDigits[i+1].TScore || i == len(fieldsDigits)-1 {
+		if i == len(fieldsDigits)-1 || fieldsDigits[i].TScore > fieldsDigits[i+1].TScore {
 			code += getSymbol(fieldsDigits[i].TScore)
 		}
 	}
+	code += " "
 	for i := 0; i < len(fieldsWords); i++ {
 		code += fieldsWords[i].num
-		if fieldsWords[i].TScore > fieldsWords[i+1].TScore || i == len(fieldsWords)-1 {
+		if i == len(fieldsWords)-1 || fieldsWords[i].TScore > fieldsWords[i+1].TScore {
 			code += getSymbol(fieldsWords[i].TScore)
 		}
 	}

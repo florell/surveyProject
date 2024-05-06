@@ -11,7 +11,6 @@
             background-color: #f8f9fa;
         }
         .container {
-            max-width: 600px;
             margin: 50px auto;
         }
         .card {
@@ -23,21 +22,21 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="text-center mb-4">Выберите опрос:</h1>
-        <div class="row">
-            {{range .}}
-            <div class="col-md-6 mb-4">
-                <a href="/survey/{{.SurveyID}}" class="card text-center p-4">
-                    <h5 class="card-title">{{.Title}}</h5>
-                    <p class="card-text">{{.Description}}</p>
-                </a>
-            </div>
-            {{end}}
+<div class="container">
+    <h1 class="text-center mb-4">Выберите опрос:</h1>
+    <div class="row row-cols-1 row-cols-md-3">
+        {{range .}}
+        <div class="col mb-4">
+            <a href="/survey/{{.SurveyID}}" class="card text-center p-4">
+                <h5 class="card-title">{{.Title}}</h5>
+                <p class="card-text">{{.Description}}</p>
+            </a>
         </div>
+        {{end}}
     </div>
+</div>
 
-    <!-- Bootstrap JS (optional if you need Bootstrap JavaScript functionality) -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Bootstrap JS (optional if you need Bootstrap JavaScript functionality) -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

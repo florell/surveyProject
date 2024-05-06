@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Progress Bars</title>
+    <title>Ваши Результаты</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -54,6 +54,23 @@
             left: 0;
         }
 
+        .return-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .return-button:hover {
+            background-color: #45a049;
+        }
+
         .progress-bar-label {
             text-align: left;
             padding-bottom: 10px;
@@ -78,6 +95,8 @@
 
 <div class="container">
     <div id="progress-bars"></div>
+    <button class="return-button" onclick="window.location.href='choose'">Вернуться на главную</button>
+
 </div>
 
 <script>

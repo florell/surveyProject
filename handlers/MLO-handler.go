@@ -73,7 +73,7 @@ func getValue(yes []int, no []int, s *types.SurveyResults) int {
 	}
 	for _, value := range no {
 		if s.Picked[value+90+50+26+21+30] == -1 {
-			result--
+			result++
 		}
 	}
 	

@@ -85,7 +85,7 @@
             <input type="hidden" name="survey_id" value="{{ .SurveyID }}">
             {{ range $index, $question := .Questions }}
                 <div class="survey-question">
-                    <label>{{ $question.Title }}</label>
+                    <label>{{ sum $index 1 }}. {{ $question.Title }}</label>
                     {{ range $answerIndex, $answer := $question.Answers }}
                         <div class="survey-answer form-check">
                             <input class="form-check-input" type="radio" id="question{{ $question.QuestionID }}_answer{{ $answer.AnswerID }}" name="question{{ $question.QuestionID }}" value="{{ $answer.Value }}">

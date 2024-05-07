@@ -15,9 +15,53 @@
         }
         .card {
             transition: transform 0.3s;
+            border-radius: 10px; /* Закругление углов */
+            border: none; /* Убираем рамку */
         }
         .card:hover {
             transform: translateY(-5px);
+            box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.1); /* Тень при наведении */
+        }
+        .card-title {
+            color: #333; /* Цвет заголовка */
+        }
+        .card-text {
+            color: #666; /* Цвет текста */
+        }
+        /* Классы для цветов карточек */
+        .card-color-0 {
+            background-color: #e4e4e4; /* Белый */
+        }
+        .card-color-1 {
+            background-color: #f8d7da; /* Красный */
+        }
+        .card-color-2 {
+            background-color: #c3e6cb; /* Зеленый */
+        }
+        .card-color-3 {
+            background-color: #bee5eb; /* Голубой */
+        }
+        .card-color-4 {
+            background-color: #fff3cd; /* Желтый */
+        }
+        .card-color-5 {
+            background-color: #aca6fe; /* Фиолетовый */
+        }
+        /* Далее - заглушки */
+        .card-color-6 {
+            background-color: #f6e58d; /*  */
+        }
+        .card-color-7 {
+            background-color: #ff7979; /*  */
+        }
+        .card-color-8 {
+            background-color: #badc58; /*  */
+        }
+        .card-color-9 {
+            background-color: #dff9fb; /*  */
+        }
+        .card-color-10 {
+            background-color: #f9ece9; /*  */
         }
     </style>
 </head>
@@ -25,11 +69,11 @@
 <div class="container">
     <h1 class="text-center mb-4">Выберите опрос:</h1>
     <div class="row row-cols-1 row-cols-md-3">
-        {{range .}}
+        {{range $i, $survey := .}}
         <div class="col mb-4">
-            <a href="/survey/{{.SurveyID}}" class="card text-center p-4">
-                <h5 class="card-title">{{.Title}}</h5>
-                <p class="card-text">{{.Description}}</p>
+            <a href="/survey/{{$survey.SurveyID}}" class="card text-center p-4 card-color-{{$i}}">
+                <h5 class="card-title">{{$survey.Title}}</h5>
+                <p class="card-text">{{$survey.Description}}</p>
             </a>
         </div>
         {{end}}

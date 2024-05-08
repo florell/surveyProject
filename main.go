@@ -194,8 +194,14 @@ func surveyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Execute the template with survey data
-	err = tmpl.Execute(w, survey)
+	// Execute the template with survey data and question count
+	err = tmpl.Execute(w, struct {
+		Survey        types.Survey
+		QuestionCount int
+	}{
+		Survey:        survey,
+		QuestionCount: len(survey.Questions),
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -254,7 +260,7 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	for key, values := range r.Form {
 		if strings.HasPrefix(key, "question") {
 			// Extract question number and answer ID
-			questionID := strings.Split(key, "question")[1]
+			questionID := strings.Split(strings.Split(key, "question")[1], "_")[0]
 			for _, value := range values {
 				qIDint, ok := strconv.Atoi(questionID)
 				if ok != nil {

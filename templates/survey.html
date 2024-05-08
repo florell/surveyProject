@@ -3,103 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Опрос {{ .SurveyID}}</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: Arial, sans-serif;
-            padding-top: 20px;
-        }
-        .survey-container {
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            padding: 40px;
-            margin: auto;
-            max-width: 600px;
-        }
-        .survey-question {
-            border-bottom: 1px solid #dee2e6;
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-        }
-        .survey-question label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 10px;
-        }
-        .survey-answer {
-            margin-bottom: 15px;
-        }
-        .survey-submit {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .form-check-input[type="radio"] {
-            display: none;
-        }
-        .form-check-input[type="radio"] + .custom-radio:before {
-            content: '';
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            background-color: #fff;
-            border: 2px solid #007bff;
-            border-radius: 50%;
-            vertical-align: middle;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-        .form-check-input[type="radio"]:checked + .custom-radio:before {
-            background-color: #007bff;
-        }
-        .form-check-input[type="radio"]:disabled + .custom-radio:before {
-            background-color: #ccc;
-            border-color: #ccc;
-            cursor: not-allowed;
-        }
-        .return-button {
-            display: block;
-            margin: 20px 0;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            text-align: center;
-            position: fixed;
-            top: 0;
-            left: 20px;
-        }
-    </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Survey</title>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    #survey-form {
+        width: 80%;
+        max-width: 600px;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    #question-container {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .question {
+        margin-bottom: 20px;
+    }
+    h2 {
+        margin-top: 0;
+    }
+    .answers {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .answer {
+        margin: 5px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .answer:hover {
+        background-color: #0056b3;
+    }
+    #prev-button, #submit-button {
+        margin-right: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #28a745;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    #prev-button:hover, #submit-button:hover {
+        background-color: #218838;
+    }
+</style>
 </head>
 <body>
-<button class="return-button" onclick="window.location.href='/choose'"><i class="fas fa-home"></i></button>
-    <div class="container survey-container">
-        <h1 class="text-center mb-4">{{ .Title }}</h1>
-        <form action="/submit_survey" method="post">
-            <input type="hidden" name="survey_id" value="{{ .SurveyID }}">
-            {{ range $index, $question := .Questions }}
-                <div class="survey-question">
-                    <label>{{ sum $index 1 }}. {{ $question.Title }}</label>
-                    {{ range $answerIndex, $answer := $question.Answers }}
-                        <div class="survey-answer form-check">
-                            <input class="form-check-input" type="radio" id="question{{ $question.QuestionID }}_answer{{ $answer.AnswerID }}" name="question{{ $question.QuestionID }}" value="{{ $answer.Value }}">
-                            <label class="form-check-label custom-radio" for="question{{ $question.QuestionID }}_answer{{ $answer.AnswerID }}">{{ $answer.Text }}</label>
-                        </div>
-                    {{ end }}
+<form id="survey-form" action="/submit_survey" method="post">
+    <div id="question-container">
+        <input type="hidden" name="survey_id" value="{{ .Survey.SurveyID }}">
+        {{range $index, $question := .Survey.Questions}}
+            <div class="question" id="question{{$question.QuestionID}}" name="question{{ $question.QuestionID }}">
+                <h2>{{$index}}: {{$question.Title}}</h2>
+                <div class="answers">
+                    {{range $answer := $question.Answers}}
+                    <input type="hidden" id="question{{ $question.QuestionID }}_answer{{ $answer.AnswerID }}" name="question{{$question.QuestionID}}_answer{{$answer.AnswerID}}" value="{{$answer.Value}}">
+                    <button 
+                        type="button"
+                        class="answer"
+                        for="question{{ $question.QuestionID }}_answer{{ $answer.AnswerID }}">
+                        {{$answer.Text}}
+                    </button>
+                    {{end}}
                 </div>
-            {{ end }}
-            <div class="survey-submit">
-                <button type="submit" class="btn btn-primary">Отправить</button>
             </div>
-        </form>
+        {{end}}
     </div>
+    <button id="prev-button" style="display:none;">Previous Question</button>
+    <button id="submit-button">Submit</button>
+</form>
+    <input type="hidden" id="questionCount" name="questionCount" value="{{.QuestionCount}}">
 
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                var currentQuestion = 0;
+                var answeredQuestions = 0;
+                var questions = document.querySelectorAll('.question');
+                var prevButton = document.getElementById('prev-button');
+                var submitButton = document.getElementById('submit-button');
+                var questionCount = parseInt(document.getElementById('questionCount').value);
+    
+                function showQuestion(questionIndex) {
+                    for (var i = 0; i < questions.length; i++) {
+                        questions[i].style.display = 'none';
+                    }
+                    if (questionIndex === questionCount) {
+                        submitButton.style.display = 'block';
+                    } else {
+                        submitButton.style.display = 'none';
+                        questions[questionIndex].style.display = 'block';
+                    }
+                }
+
+                function nextQuestion() {
+                    currentQuestion++;
+                    showQuestion(currentQuestion);
+                    prevButton.style.display = 'block';
+                }
+
+                function prevQuestion() {
+                    if (currentQuestion > 0) {
+                        currentQuestion--;
+                        showQuestion(currentQuestion);
+                        if (currentQuestion === 0) {
+                            prevButton.style.display = 'none';
+                        }
+                    }
+                }
+    
+                showQuestion(currentQuestion);
+    
+                var answerButtons = document.querySelectorAll('.answer');
+                answerButtons.forEach(function(button) {
+                    button.addEventListener('click', function() {
+                        nextQuestion();
+                    });
+                });
+    
+                prevButton.addEventListener('click', function() {
+                    prevQuestion();
+                });
+    
+                submitButton.addEventListener('click', function() {
+                    document.getElementById('survey-form').submit();
+                });
+
+            });
+        </script>
 </html>

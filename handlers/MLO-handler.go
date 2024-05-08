@@ -73,7 +73,7 @@ func getValue(yes []int, no []int, s *types.SurveyResults) int {
 	}
 	for _, value := range no {
 		if s.Picked[value+90+50+26+21+30] == -1 {
-			result--
+			result++
 		}
 	}
 	
@@ -153,7 +153,7 @@ func getCode(result *MLOResult) string {
 			code += getSymbol(fieldsDigits[i].TScore)
 		}
 	}
-	code += " "
+	code += "   "
 	for i := 0; i < len(fieldsWords); i++ {
 		code += fieldsWords[i].num
 		if i == len(fieldsWords)-1 || fieldsWords[i].TScore > fieldsWords[i+1].TScore {

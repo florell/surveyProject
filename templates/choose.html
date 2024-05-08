@@ -11,33 +11,106 @@
             background-color: #f8f9fa;
         }
         .container {
-            max-width: 600px;
             margin: 50px auto;
         }
         .card {
             transition: transform 0.3s;
+            border-radius: 10px; /* Закругление углов */
+            border: none; /* Убираем рамку */
+            cursor: pointer; /* Устанавливаем курсор в виде руки */
         }
         .card:hover {
             transform: translateY(-5px);
+            box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.1); /* Тень при наведении */
+        }
+        .card-title {
+            color: #333; /* Цвет заголовка */
+        }
+        .card-text {
+            color: #666; /* Цвет текста */
+        }
+        /* Классы для цветов карточек */
+        .card-color-0 {
+            background-color: #e4e4e4; /* Белый */
+        }
+        .card-color-1 {
+            background-color: #f8d7da; /* Красный */
+        }
+        .card-color-2 {
+            background-color: #c3e6cb; /* Зеленый */
+        }
+        .card-color-3 {
+            background-color: #bee5eb; /* Голубой */
+        }
+        .card-color-4 {
+            background-color: #fff3cd; /* Желтый */
+        }
+        .card-color-5 {
+            background-color: #aca6fe; /* Фиолетовый */
+        }
+        /* Стили для кнопки "Подробнее" */
+        .more-info-btn {
+            background-color: #FFFFFF;
+            border-color: black;
+            color: black;
+        }
+        .more-info-btn:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .close:focus,
+        .close:active {
+            outline: none;
+            box-shadow: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="text-center mb-4">Выберите опрос:</h1>
-        <div class="row">
-            {{range .}}
-            <div class="col-md-6 mb-4">
-                <a href="/survey/{{.SurveyID}}" class="card text-center p-4">
-                    <h5 class="card-title">{{.Title}}</h5>
-                    <p class="card-text">{{.Description}}</p>
-                </a>
+<div class="container">
+    <h1 class="text-center mb-4">Выберите опрос:</h1>
+    <div class="row row-cols-1 row-cols-md-3">
+        {{range $i, $survey := .}}
+        <div class="col mb-4">
+            <div class="card text-center p-4 card-color-{{$i}}" onclick="redirectToSurvey('{{.SurveyID}}')">
+                <h5 class="card-title">{{$survey.Title}}</h5>
+                <button class="btn btn-primary btn-sm more-info-btn" onclick="showModal('{{$survey.Title}}', '{{$survey.Description}}')">Подробнее</button>
+                <div class="description" style="display: none;">{{$survey.Description}}</div>
             </div>
-            {{end}}
+        </div>
+        {{end}}
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Description will be loaded here -->
+            </div>
         </div>
     </div>
+</div>
 
-    <!-- Bootstrap JS (optional if you need Bootstrap JavaScript functionality) -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script>
+    function showModal(title, description) {
+        $("#modalLabel").text(title);
+        $("#modalBody").html(description);
+        $("#modal").modal("show");
+        event.stopPropagation(); // предотвращает распространение события на родительский элемент
+    }
+    function redirectToSurvey(id) {
+        window.location.href = "/survey/" + id;
+    }
+</script>
 </body>
 </html>

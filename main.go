@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"flag"
@@ -8,10 +9,14 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"psychward/handlers"
 	types "psychward/src"
 	"strconv"
 	"strings"
+	"syscall"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -370,9 +375,30 @@ func main() {
 	r.HandleFunc("/result", resultHandler)
 	http.Handle("/", r)
 
-	fmt.Println("Server is running on port 8080...")
-	err = http.ListenAndServe(":8080", nil)
-	if err != nil {
-		log.Fatalln(err)
+	srv := &http.Server{
+		Addr: ":8080",
 	}
+	// Запуск сервера в горутине
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+	log.Printf("Server started serving on port: %s", srv.Addr)
+
+	// Ожидание сигнала остановки сервера
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("Server shutting down...")
+
+	// Создание контекста с таймаутом
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// Завершение работы сервера
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatalf("Server forced to shutdown: %v", err)
+	}
+	log.Println("Server gracefully stopped")
 }

@@ -39,6 +39,7 @@
         justify-content: center;
         align-items: center;
         flex-wrap: wrap;
+        flex-direction: column;
     }
     .answer {
         margin: 5px;
@@ -55,7 +56,7 @@
         background-color: #0056b3;
     }
     #prev-button, #submit-button {
-        margin-right: 10px;
+        margin: auto;
         padding: 10px 20px;
         font-size: 16px;
         background-color: #28a745;
@@ -111,8 +112,8 @@
             </div>
         {{end}}
     </div>
-    <button id="prev-button" style="display:none;">Previous Question</button>
-    <button id="submit-button">Submit</button>
+    <button id="prev-button" type="button" style="display:none;">Назад</button>
+    <button id="submit-button">Отправить</button>
 </form>
     <input type="hidden" id="questionCount" name="questionCount" value="{{.QuestionCount}}">
 
@@ -125,7 +126,7 @@
                 var prevButton = document.getElementById('prev-button');
                 var submitButton = document.getElementById('submit-button');
                 var questionCount = parseInt(document.getElementById('questionCount').value);
-    
+
                 function showQuestion(questionIndex) {
                     for (var i = 0; i < questions.length; i++) {
                         questions[i].style.display = 'none';
@@ -153,20 +154,20 @@
                         }
                     }
                 }
-    
+
                 showQuestion(currentQuestion);
-    
+
                 var answerButtons = document.querySelectorAll('.answer');
                 answerButtons.forEach(function(button) {
                     button.addEventListener('click', function() {
                         nextQuestion();
                     });
                 });
-    
+
                 prevButton.addEventListener('click', function() {
                     prevQuestion();
                 });
-    
+
                 submitButton.addEventListener('click', function() {
                     document.getElementById('survey-form').submit();
                 });

@@ -126,18 +126,19 @@
 
         function showQuestion(questionIndex) {
             if (questionIndex === questionCount) {
+                prevButton.style.display = 'none';
                 document.getElementById('survey-form').submit();
-                prevButton.style.display = 'none';
-            }
-            for (var i = 0; i < questions.length; i++) {
-                questions[i].style.display = 'none';
-            }
-            if (questionIndex === 0) {
-                prevButton.style.display = 'none';
             } else {
-                prevButton.style.display = 'block'; // Show prev button for other questions
+                for (var i = 0; i < questions.length; i++) {
+                    questions[i].style.display = 'none';
+                }
+                if (questionIndex === 0) {
+                    prevButton.style.display = 'none';
+                } else {
+                    prevButton.style.display = 'block'; // Show prev button for other questions
+                }
+                questions[questionIndex].style.display = 'block';
             }
-            questions[questionIndex].style.display = 'block';
         }
 
         function nextQuestion() {

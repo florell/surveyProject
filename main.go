@@ -286,6 +286,8 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		Picked:    selectedAnswers,
 	}
 	
+	fmt.Println(surveyResults)
+	
 	var analysis []byte
 	switch surveyID {
 	case 1:

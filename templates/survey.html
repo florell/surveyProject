@@ -39,6 +39,7 @@
         justify-content: center;
         align-items: center;
         flex-wrap: wrap;
+        flex-direction: column;
     }
     .answer {
         margin: 5px;
@@ -55,7 +56,7 @@
         background-color: #0056b3;
     }
     #prev-button, #submit-button {
-        margin-right: 10px;
+        margin: auto;
         padding: 10px 20px;
         font-size: 16px;
         background-color: #28a745;
@@ -68,15 +69,35 @@
     #prev-button:hover, #submit-button:hover {
         background-color: #218838;
     }
+    .return-button {
+        display: block;
+        margin: 20px 0;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        text-align: center;
+        position: fixed;
+        top: 0;
+        left: 20px;
+    }
+    .return-button:hover {
+        background-color: #45a049;
+    }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+<button class="return-button" onclick="window.location.href='/choose'"><i class="fas fa-home"></i></button>
 <form id="survey-form" action="/submit_survey" method="post">
     <div id="question-container">
         <input type="hidden" name="survey_id" value="{{ .Survey.SurveyID }}">
         {{range $index, $question := .Survey.Questions}}
             <div class="question" id="question{{$question.QuestionID}}" name="question{{ $question.QuestionID }}">
-                <h2>{{$index}}: {{$question.Title}}</h2>
+                <h3>{{sum $index 1}}. {{$question.Title}}</h3>
                 <div class="answers">
                     {{range $answer := $question.Answers}}
                     <input type="hidden" id="question{{ $question.QuestionID }}_answer{{ $answer.AnswerID }}" name="question{{$question.QuestionID}}_answer{{$answer.AnswerID}}" value="{{$answer.Value}}">
@@ -91,66 +112,64 @@
             </div>
         {{end}}
     </div>
-    <button id="prev-button" style="display:none;">Previous Question</button>
-    <button id="submit-button">Submit</button>
+    <button id="prev-button" type="button" style="display:none;">Назад</button>
+    <button id="submit-button">Отправить</button>
 </form>
     <input type="hidden" id="questionCount" name="questionCount" value="{{.QuestionCount}}">
 
 </body>
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                var currentQuestion = 0;
-                var answeredQuestions = 0;
-                var questions = document.querySelectorAll('.question');
-                var prevButton = document.getElementById('prev-button');
-                var submitButton = document.getElementById('submit-button');
-                var questionCount = parseInt(document.getElementById('questionCount').value);
-    
-                function showQuestion(questionIndex) {
-                    for (var i = 0; i < questions.length; i++) {
-                        questions[i].style.display = 'none';
-                    }
-                    if (questionIndex === questionCount) {
-                        submitButton.style.display = 'block';
-                    } else {
-                        submitButton.style.display = 'none';
-                        questions[questionIndex].style.display = 'block';
-                    }
-                }
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var currentQuestion = 0;
+        var questions = document.querySelectorAll('.question');
+        var prevButton = document.getElementById('prev-button');
+        var submitButton = document.getElementById('submit-button');
+        var questionCount = parseInt(document.getElementById('questionCount').value);
 
-                function nextQuestion() {
-                    currentQuestion++;
-                    showQuestion(currentQuestion);
-                    prevButton.style.display = 'block';
-                }
+        function showQuestion(questionIndex) {
+            for (var i = 0; i < questions.length; i++) {
+                questions[i].style.display = 'none';
+            }
+            if (questionIndex === questionCount - 1) { // -1 because currentQuestion is 0-based index
+                submitButton.style.display = 'block';
+                document.getElementById('survey-form').submit();
+                prevButton.style.display = 'none'; // Hide prev button on last question
+            } else {
+                submitButton.style.display = 'none';
+                prevButton.style.display = 'block'; // Show prev button for other questions
+                questions[questionIndex].style.display = 'block';
+            }
+        }
 
-                function prevQuestion() {
-                    if (currentQuestion > 0) {
-                        currentQuestion--;
-                        showQuestion(currentQuestion);
-                        if (currentQuestion === 0) {
-                            prevButton.style.display = 'none';
-                        }
-                    }
-                }
-    
+        function nextQuestion() {
+            currentQuestion++;
+            showQuestion(currentQuestion);
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
                 showQuestion(currentQuestion);
-    
-                var answerButtons = document.querySelectorAll('.answer');
-                answerButtons.forEach(function(button) {
-                    button.addEventListener('click', function() {
-                        nextQuestion();
-                    });
-                });
-    
-                prevButton.addEventListener('click', function() {
-                    prevQuestion();
-                });
-    
-                submitButton.addEventListener('click', function() {
-                    document.getElementById('survey-form').submit();
-                });
+            }
+        }
 
+        showQuestion(currentQuestion);
+
+        var answerButtons = document.querySelectorAll('.answer');
+        answerButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                nextQuestion();
             });
-        </script>
+        });
+
+        prevButton.addEventListener('click', function() {
+            prevQuestion();
+        });
+
+        submitButton.addEventListener('click', function() {
+            document.getElementById('survey-form').submit();
+        });
+
+    });
+</script>
 </html>

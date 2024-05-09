@@ -125,20 +125,19 @@
         var questionCount = parseInt(document.getElementById('questionCount').value);
 
         function showQuestion(questionIndex) {
+            if (questionIndex === questionCount) {
+                document.getElementById('survey-form').submit();
+                prevButton.style.display = 'none';
+            }
             for (var i = 0; i < questions.length; i++) {
                 questions[i].style.display = 'none';
             }
-            if (questionIndex === questionCount - 1) { // -1 because currentQuestion is 0-based index
-                document.getElementById('survey-form').submit();
-                prevButton.style.display = 'none'; // Hide prev button on last question
+            if (questionIndex === 0) {
+                prevButton.style.display = 'none';
             } else {
-                if (questionIndex === 0) {
-                    prevButton.style.display = 'none';
-                } else {
-                    prevButton.style.display = 'block'; // Show prev button for other questions
-                }
-                questions[questionIndex].style.display = 'block';
+                prevButton.style.display = 'block'; // Show prev button for other questions
             }
+            questions[questionIndex].style.display = 'block';
         }
 
         function nextQuestion() {

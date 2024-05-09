@@ -113,7 +113,6 @@
         {{end}}
     </div>
     <button id="prev-button" type="button" style="display:none;">Назад</button>
-    <button id="submit-button">Отправить</button>
 </form>
     <input type="hidden" id="questionCount" name="questionCount" value="{{.QuestionCount}}">
 
@@ -123,7 +122,6 @@
         var currentQuestion = 0;
         var questions = document.querySelectorAll('.question');
         var prevButton = document.getElementById('prev-button');
-        var submitButton = document.getElementById('submit-button');
         var questionCount = parseInt(document.getElementById('questionCount').value);
 
         function showQuestion(questionIndex) {
@@ -131,12 +129,14 @@
                 questions[i].style.display = 'none';
             }
             if (questionIndex === questionCount - 1) { // -1 because currentQuestion is 0-based index
-                submitButton.style.display = 'block';
                 document.getElementById('survey-form').submit();
                 prevButton.style.display = 'none'; // Hide prev button on last question
             } else {
-                submitButton.style.display = 'none';
-                prevButton.style.display = 'block'; // Show prev button for other questions
+                if (questionIndex === 0) {
+                    prevButton.style.display = 'none';
+                } else {
+                    prevButton.style.display = 'block'; // Show prev button for other questions
+                }
                 questions[questionIndex].style.display = 'block';
             }
         }
@@ -164,10 +164,6 @@
 
         prevButton.addEventListener('click', function() {
             prevQuestion();
-        });
-
-        submitButton.addEventListener('click', function() {
-            document.getElementById('survey-form').submit();
         });
 
     });

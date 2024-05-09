@@ -76,7 +76,7 @@
         <input type="hidden" name="survey_id" value="{{ .Survey.SurveyID }}">
         {{range $index, $question := .Survey.Questions}}
             <div class="question" id="question{{$question.QuestionID}}" name="question{{ $question.QuestionID }}">
-                <h2>{{$index}}: {{$question.Title}}</h2>
+                <h3>{{sum $index 1}}. {{$question.Title}}</h3>
                 <div class="answers">
                     {{range $answer := $question.Answers}}
                     <input type="hidden" id="question{{ $question.QuestionID }}_answer{{ $answer.AnswerID }}" name="question{{$question.QuestionID}}_answer{{$answer.AnswerID}}" value="{{$answer.Value}}">

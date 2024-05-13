@@ -31,7 +31,8 @@ CREATE TABLE IF NOT EXISTS patients (
     Name VARCHAR(255),
     Surname VARCHAR(255),
     Age INT,
-    Sex VARCHAR(255)
+    Sex VARCHAR(255),
+    UNIQUE KEY unique_columns (Name, Surname, Age, Sex)
 );
 
 CREATE TABLE IF NOT EXISTS survey_results (

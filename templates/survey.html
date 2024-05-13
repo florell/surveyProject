@@ -88,6 +88,14 @@
         background-color: #45a049;
     }
 </style>
+<script>
+        function saveValue(button) {
+        var questionID = button.getAttribute('question')
+        var value = button.getAttribute('value')
+        sessionStorage.setItem('question_'+ questionID, value)  
+        console.log("got : " + questionID + " " + value)      
+    }
+</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -100,11 +108,12 @@
                 <h3>{{sum $index 1}}. {{$question.Title}}</h3>
                 <div class="answers">
                     {{range $answer := $question.Answers}}
-                    <input type="hidden" id="question{{ $question.QuestionID }}_answer{{ $answer.AnswerID }}" name="question{{$question.QuestionID}}_answer{{$answer.AnswerID}}" value="{{$answer.Value}}">
                     <button 
                         type="button"
+                        question="{{$question.QuestionID}}"
+                        value="{{$answer.Value}}"
                         class="answer"
-                        for="question{{ $question.QuestionID }}_answer{{ $answer.AnswerID }}">
+                        onclick="saveValue(this)">
                         {{$answer.Text}}
                     </button>
                     {{end}}
@@ -112,10 +121,10 @@
             </div>
         {{end}}
     </div>
-    <button id="prev-button" type="button" style="display:none;">Назад</button>
+    <button type="button" id="prev-button" type="button" style="display:none;">Назад</button>
 </form>
     <input type="hidden" id="questionCount" name="questionCount" value="{{.QuestionCount}}">
-
+    <input type="hidden" id="firstQuestionID" name="firstQuestionID" value="{{.FirstQuestionID}}">
 </body>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -123,11 +132,13 @@
         var questions = document.querySelectorAll('.question');
         var prevButton = document.getElementById('prev-button');
         var questionCount = parseInt(document.getElementById('questionCount').value);
+        var firstQuestionID = parseInt(document.getElementById('firstQuestionID').value);
+
 
         function showQuestion(questionIndex) {
             if (questionIndex === questionCount) {
                 prevButton.style.display = 'none';
-                document.getElementById('survey-form').submit();
+                submitForm();
             } else {
                 for (var i = 0; i < questions.length; i++) {
                     questions[i].style.display = 'none';
@@ -137,6 +148,7 @@
                 } else {
                     prevButton.style.display = 'block'; // Show prev button for other questions
                 }
+                console.log(questionIndex)
                 questions[questionIndex].style.display = 'block';
             }
         }
@@ -167,5 +179,29 @@
         });
 
     });
+
+    function submitForm() {
+    event.preventDefault();
+    var form = document.getElementById('survey-form');
+
+    for (var i = 0 + parseInt(firstQuestionID.value); i < parseInt(questionCount.value) + parseInt(firstQuestionID.value); i++) {
+        var answerValue = sessionStorage.getItem('question_' + i);
+        console.log('Answer for question_' + i + ':', answerValue);
+
+        var hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'question_' + i; 
+        hiddenInput.value = answerValue;
+        console.log('Hidden input:', hiddenInput);
+
+        form.appendChild(hiddenInput);
+        console.log('Form:', form);
+    }
+
+    // Submit the form
+    form.submit();
+};
+
+
 </script>
 </html>

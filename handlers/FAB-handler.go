@@ -9,7 +9,7 @@ import (
 
 func FABHandler(s *types.SurveyResults) []byte {
 	result := map[string]map[string]string{
-		"Результат": {
+		"Батарея лобной дисфункции": {
 			"value":       "0",
 			"max_value":   "18",
 			"description": "",

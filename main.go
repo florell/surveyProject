@@ -315,7 +315,7 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Prepare SQL statement
-	stmt, err := db.Prepare("INSERT INTO survey_results (PatientID, SurveyID, Result) VALUES (?, ?, ?)")
+	stmt, err := db.Prepare("INSERT INTO survey_results (PatientID, SurveyID, CurDate, Result) VALUES (?, ?, CURDATE(), ?)")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -1,3 +1,4 @@
+USE psy_data;
 -- Disable foreign key check
 SET FOREIGN_KEY_CHECKS = 0;
 

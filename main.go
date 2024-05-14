@@ -374,9 +374,14 @@ func main() {
 	}(db)
 
 	pushFlag := flag.Bool("push", false, "Use this flag to push")
+	excFlag := flag.Bool("excel", false, "Use this flag to create an excel table")
 	flag.Parse()
 	if *pushFlag {
 		pushTest(db)
+		return
+	}
+	if *excFlag {
+		makeTable(db)
 		return
 	}
 

@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS survey_results (
     Result JSON,
     CurDate Date,
     FOREIGN KEY (PatientID) REFERENCES patients(ID),
-    FOREIGN KEY (SurveyID) REFERENCES surveys(ID)
+    FOREIGN KEY (SurveyID) REFERENCES surveys(ID),
+    UNIQUE KEY unique_columns (PatientID, SurveyID)
 );
 

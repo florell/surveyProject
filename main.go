@@ -315,7 +315,7 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Prepare SQL statement
-	stmt, err := db.Prepare("INSERT INTO survey_results (PatientID, SurveyID, CurDate, Result) VALUES (?, ?, CURDATE(), ?)")
+	stmt, err := db.Prepare("INSERT INTO survey_results (PatientID, SurveyID, CurDate, Result) VALUES (?, ?, CURDATE(), ?) ON DUPLICATE KEY UPDATE CurDate = CURDATE(), Result = ?")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -327,7 +327,7 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	}(stmt)
 
 	// Execute the SQL statement
-	_, err = stmt.Exec(patientID, surveyID, string(analysis))
+	_, err = stmt.Exec(patientID, surveyID, string(analysis), string(analysis))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -4,98 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Survey</title>
-</head>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
-    #survey-form {
-        width: 80%;
-        max-width: 600px;
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    #question-container {
-        text-align: center;
-        margin-bottom: 20px;
-    }
-    .question {
-        margin-bottom: 20px;
-    }
-    h2 {
-        margin-top: 0;
-    }
-    .answers {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-wrap: wrap;
-        flex-direction: column;
-    }
-    .answer {
-        margin: 5px;
-        padding: 10px 20px;
-        font-size: 16px;
-        background-color: #007bff;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-    .answer:hover {
-        background-color: #0056b3;
-    }
-    #prev-button, #submit-button {
-        margin: auto;
-        padding: 10px 20px;
-        font-size: 16px;
-        background-color: #28a745;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-    #prev-button:hover, #submit-button:hover {
-        background-color: #218838;
-    }
-    .return-button {
-        display: block;
-        margin: 20px 0;
-        padding: 10px 20px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        text-align: center;
-        position: fixed;
-        top: 0;
-        left: 20px;
-    }
-    .return-button:hover {
-        background-color: #45a049;
-    }
-</style>
-<script>
-        function saveValue(button) {
-        var questionID = button.getAttribute('question')
-        var value = button.getAttribute('value')
-        sessionStorage.setItem('question_'+ questionID, value)      
-    }
-</script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #survey-form {
+            width: 80%;
+            max-width: 600px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #question-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        h2 {
+            margin-top: 0;
+        }
+        .answers {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            flex-direction: column;
+        }
+        .answer {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .answer:hover {
+            background-color: #0056b3;
+        }
+        #prev-button, #submit-button {
+            margin: auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #prev-button:hover, #submit-button:hover {
+            background-color: #218838;
+        }
+        .return-button {
+            display: block;
+            margin: 20px 0;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 20px;
+        }
+        .return-button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
 <button class="return-button" onclick="window.location.href='/choose'"><i class="fas fa-home"></i></button>
@@ -106,12 +98,13 @@
             <div class="question" id="question{{$question.QuestionID}}" name="question{{ $question.QuestionID }}">
                 <h3>{{sum $index 1}}. {{$question.Title}}</h3>
                 <div class="answers">
-                    {{range $answer := $question.Answers}}
+                    {{range $answerIndex, $answer := $question.Answers}}
                     <button 
                         type="button"
                         question="{{$question.QuestionID}}"
                         value="{{$answer.Value}}"
                         class="answer"
+                        data-answer-index="{{ sum $answerIndex 1}}"
                         onclick="saveValue(this)">
                         {{$answer.Text}}
                     </button>
@@ -120,19 +113,23 @@
             </div>
         {{end}}
     </div>
-    <button type="button" id="prev-button" type="button" style="display:none;">Назад</button>
+    <button type="button" id="prev-button" style="display:none;">Назад</button>
 </form>
-    <input type="hidden" id="questionCount" name="questionCount" value="{{.QuestionCount}}">
-    <input type="hidden" id="firstQuestionID" name="firstQuestionID" value="{{.FirstQuestionID}}">
-</body>
+<input type="hidden" id="questionCount" name="questionCount" value="{{.QuestionCount}}">
+<input type="hidden" id="firstQuestionID" name="firstQuestionID" value="{{.FirstQuestionID}}">
 <script>
+    function saveValue(button) {
+        var questionID = button.getAttribute('question');
+        var value = button.getAttribute('value');
+        sessionStorage.setItem('question_' + questionID, value);
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         var currentQuestion = 0;
         var questions = document.querySelectorAll('.question');
         var prevButton = document.getElementById('prev-button');
         var questionCount = parseInt(document.getElementById('questionCount').value);
         var firstQuestionID = parseInt(document.getElementById('firstQuestionID').value);
-
 
         function showQuestion(questionIndex) {
             if (questionIndex === questionCount) {
@@ -145,7 +142,7 @@
                 if (questionIndex === 0) {
                     prevButton.style.display = 'none';
                 } else {
-                    prevButton.style.display = 'block'; // Show prev button for other questions
+                    prevButton.style.display = 'block';
                 }
                 questions[questionIndex].style.display = 'block';
             }
@@ -176,27 +173,39 @@
             prevQuestion();
         });
 
+        document.addEventListener('keydown', function(event) {
+            if (event.key >= '1' && event.key <= '9') {
+                var answerIndex = parseInt(event.key);
+                var visibleQuestion = questions[currentQuestion];
+                var answerButton = visibleQuestion.querySelector('.answer[data-answer-index="' + answerIndex + '"]');
+                if (answerButton) {
+                    answerButton.click();
+                }
+            }
+            if (event.keyCode === 8) {
+                var prevButton = document.getElementById('prev-button');
+                prevButton.click();
+            }
+        });
     });
 
     function submitForm() {
-    event.preventDefault();
-    var form = document.getElementById('survey-form');
+        event.preventDefault();
+        var form = document.getElementById('survey-form');
 
-    for (var i = 0 + parseInt(firstQuestionID.value); i < parseInt(questionCount.value) + parseInt(firstQuestionID.value); i++) {
-        var answerValue = sessionStorage.getItem('question_' + i);
+        for (var i = 0 + parseInt(firstQuestionID.value); i < parseInt(questionCount.value) + parseInt(firstQuestionID.value); i++) {
+            var answerValue = sessionStorage.getItem('question_' + i);
 
-        var hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = 'question_' + i; 
-        hiddenInput.value = answerValue;
+            var hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'question_' + i; 
+            hiddenInput.value = answerValue;
 
-        form.appendChild(hiddenInput);
+            form.appendChild(hiddenInput);
+        }
+
+        form.submit();
     }
-
-    // Submit the form
-    form.submit();
-};
-
-
 </script>
+</body>
 </html>

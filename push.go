@@ -11,7 +11,6 @@ import (
 	types "psychward/src"
 	"sort"
 	"strconv"
-	"strings"
 	
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -64,7 +63,6 @@ func pushTest(db *sql.DB) {
 		}
 		
 		insertSurveyQuery := "INSERT INTO surveys (id, title, description) VALUES (?, ?, ?)"
-		survey.Title = strings.Replace(survey.Title, "\n", "<br>", -1)
 		res, err := db.Exec(insertSurveyQuery, survey.SurveyID, survey.Title, survey.Description)
 		if err != nil {
 			log.Fatalf("Error inserting survey: %v", err)

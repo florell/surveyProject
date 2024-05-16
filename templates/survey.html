@@ -18,7 +18,7 @@
         }
         #survey-form {
             width: 80%;
-            max-width: 600px;
+            max-width: 800px;
             background-color: #fff;
             padding: 20px;
             border-radius: 10px;
@@ -87,6 +87,9 @@
         .return-button:hover {
             background-color: #45a049;
         }
+        .question-text {
+            font-weight: normal;
+        }
     </style>
 </head>
 <body>
@@ -96,7 +99,7 @@
         <input type="hidden" name="survey_id" value="{{ .Survey.SurveyID }}">
         {{range $index, $question := .Survey.Questions}}
             <div class="question" id="question{{$question.QuestionID}}" name="question{{ $question.QuestionID }}">
-                <h3>{{sum $index 1}}. {{$question.Title}}</h3>
+                <h3>{{sum $index 1}}. <span class="question-text">{{$question.Title}}</span></h3>
                 <div class="answers">
                     {{range $answerIndex, $answer := $question.Answers}}
                     <button 

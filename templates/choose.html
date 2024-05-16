@@ -72,6 +72,11 @@
             outline: none;
             box-shadow: none;
         }
+        .bottom-left {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -106,6 +111,9 @@
         </div>
     </div>
 </div>
+<div class="bottom-left">
+    <button id="downloadTableBtn" class="btn btn-secondary" onclick="downloadTable()">Скачать таблицу</button>
+</div>
 
 <!-- Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -119,6 +127,24 @@
     }
     function redirectToSurvey(id) {
         window.location.href = "/survey/" + id;
+    }
+    function downloadTable() {
+        $.ajax({
+            url: '/get_table',
+            type: 'GET',
+            success: function () {
+                // Создаем скрытую ссылку для скачивания файла
+                const link = document.createElement('a');
+                link.href = '/download_table';
+                link.download = 'survey_results.xlsx';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            },
+            error: function () {
+                alert('Ошибка при создании таблицы.');
+            }
+        });
     }
 </script>
 </body>

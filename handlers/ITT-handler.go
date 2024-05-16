@@ -73,7 +73,7 @@ func getGeneralScore(value, age int, sex string) int {
 }
 
 func getEDValue(id, value int) int {
-	switch id {
+	switch id % 15 {
 	case 1:
 		switch value {
 		case 1:
@@ -113,7 +113,7 @@ func getEDValue(id, value int) int {
 }
 
 func getASTValue(id, value int) int {
-	switch id {
+	switch id % 15 {
 	case 8:
 		switch value {
 		case 1:
@@ -153,7 +153,7 @@ func getASTValue(id, value int) int {
 }
 
 func getFOBValue(id, value int) int {
-	switch id {
+	switch id % 15 {
 	case 7:
 		switch value {
 		case 1:
@@ -193,7 +193,7 @@ func getFOBValue(id, value int) int {
 }
 
 func getOPValue(id, value int) int {
-	switch id {
+	switch id % 15 {
 	case 3:
 		switch value {
 		case 1:
@@ -216,7 +216,7 @@ func getOPValue(id, value int) int {
 		default:
 			return 0
 		}
-	case 15:
+	case 0: // mean 15
 		switch value {
 		case 1:
 			return 31
@@ -233,7 +233,7 @@ func getOPValue(id, value int) int {
 }
 
 func getSZValue(id, value int) int {
-	switch id {
+	switch id % 15 {
 	case 10:
 		switch value {
 		case 1:

@@ -289,6 +289,7 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	fmt.Println(surveyResults)
+	fmt.Println("^^^^ ", surveyID)
 	
 	var analysis []byte
 	switch surveyID {
@@ -340,10 +341,11 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	var resultID string
-	if err := db.QueryRow("SELECT LAST_INSERT_ID()").Scan(&resultID); err != nil {
+	if err := db.QueryRow("SELECT MAX(id) FROM survey_results").Scan(&resultID); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	fmt.Println("resultID =", resultID)
 	
 	// Redirect after successful form submission
 	http.Redirect(w, r, "/result?survey_id="+strconv.Itoa(surveyID)+"&result_id="+resultID, http.StatusSeeOther)
@@ -414,7 +416,7 @@ func downloadTable(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
-
+	
 	// Отправляем файл пользователю
 	w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 	w.Header().Set("Content-Disposition", "attachment; filename=survey_results.xlsx")

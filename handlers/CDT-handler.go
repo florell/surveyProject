@@ -10,13 +10,13 @@ import (
 func CDTHandler(s *types.SurveyResults) []byte {
 	result := map[string]map[string]string{
 		"Тест рисования часов": {
-			"value":       fmt.Sprintf("%d", s.Picked[0]),
+			"value":       fmt.Sprintf("%d", s.Picked[398]),
 			"max_value":   "10",
 			"description": "",
 		},
 	}
 	
-	if s.Picked[0] != 10 {
+	if s.Picked[398] != 10 {
 		result["Тест рисования часов"]["description"] = "Наличие выраженных нарушений памяти"
 	} else {
 		result["Тест рисования часов"]["description"] = "Нарушений оптико-пространственного гнозиса не выявлено, конструктивный праксис сохранен"

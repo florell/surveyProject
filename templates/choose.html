@@ -72,10 +72,16 @@
             outline: none;
             box-shadow: none;
         }
-        .bottom-left {
-            position: absolute;
+        .button-container {
+            display: flex;
+            justify-content: center;
+            position: fixed;
             bottom: 10px;
-            left: 10px;
+            width: 100%;
+        }
+
+        .button-container button {
+            margin: 0 5px; /* Значительно увеличенный отступ между кнопками */
         }
     </style>
 </head>
@@ -111,8 +117,12 @@
         </div>
     </div>
 </div>
-<div class="bottom-left">
+<!--<div class="bottom-left">-->
+<!--    <button id="downloadTableBtn" class="btn btn-secondary" onclick="downloadTable()">Скачать таблицу</button>-->
+<!--</div>-->
+<div class="button-container">
     <button id="downloadTableBtn" class="btn btn-secondary" onclick="downloadTable()">Скачать таблицу</button>
+    <button id="relogin" class="btn btn-secondary" onclick="relogin()">Сменить пациента</button>
 </div>
 
 <!-- Bootstrap JS -->
@@ -145,6 +155,10 @@
                 alert('Ошибка при создании таблицы.');
             }
         });
+    }
+
+    function relogin(url) {
+        window.location.href = "/";
     }
 </script>
 </body>

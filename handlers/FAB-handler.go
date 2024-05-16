@@ -9,7 +9,7 @@ import (
 
 func FABHandler(s *types.SurveyResults) []byte {
 	result := map[string]map[string]string{
-		"Батарея лобной дисфункции": {
+		"Результат": {
 			"value":       "0",
 			"max_value":   "18",
 			"description": "",
@@ -30,6 +30,9 @@ func FABHandler(s *types.SurveyResults) []byte {
 	case count < 12:
 		result["Результат"]["description"] = "Выраженная лобная дисфункция (деменция лобного типа)"
 	}
+	
+	fmt.Println("####")
+	fmt.Println(result)
 	
 	resultJSON, err := json.Marshal(result)
 	if err != nil {

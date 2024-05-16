@@ -52,6 +52,11 @@
             font-weight: normal;
             margin-right: 10px;
         }
+        .bottom-left {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -90,10 +95,33 @@
             </form>
         </div>
     </div>
+    <div class="bottom-left">
+        <button id="downloadTableBtn" class="btn btn-secondary" onclick="downloadTable()">Скачать таблицу</button>
+    </div>
 </div>
 <!-- Bootstrap JS (Optional) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    function downloadTable() {
+        $.ajax({
+            url: '/get_table',
+            type: 'GET',
+            success: function () {
+                // Создаем скрытую ссылку для скачивания файла
+                const link = document.createElement('a');
+                link.href = '/download_table';
+                link.download = 'survey_results.xlsx';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            },
+            error: function () {
+                alert('Ошибка при создании таблицы.');
+            }
+        });
+    }
+</script>
 </body>
 </html>

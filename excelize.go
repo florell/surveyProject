@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"sort"
 	"strconv"
 
@@ -36,10 +35,10 @@ func getPatient(db *sql.DB, patientID int) (Patient, error) {
 	return p, nil
 }
 
-func makeTable(db *sql.DB) {
-	rows, err := db.Query("SELECT * FROM survey_results")
+func makeTable(db *sql.DB) error {
+	rows, err := db.Query("SELECT ID, PatientID, SurveyID, Result, CurDate FROM survey_results")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer rows.Close()
 
@@ -87,23 +86,23 @@ func makeTable(db *sql.DB) {
 
 		err := rows.Scan(&s.ID, &s.patientID, &s.surveyID, &s.resultStr, &s.curDate)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 
 		surveyName, err := getSurveyName(db, s.surveyID)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 
 		patient, err := getPatient(db, s.patientID)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 
 		var result map[string]interface{}
 		err = json.Unmarshal([]byte(s.resultStr), &result)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 
 		lastRow, exists := patientLastRow[s.patientID]
@@ -179,7 +178,9 @@ func makeTable(db *sql.DB) {
 	}
 
 	if err := xlsx.SaveAs("Survey_Results.xlsx"); err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	return err
 
 }

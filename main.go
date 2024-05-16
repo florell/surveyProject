@@ -343,6 +343,79 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/result?survey_id="+strconv.Itoa(surveyID)+"&result_id="+resultID, http.StatusSeeOther)
 }
 
+// func patientLogHandler(w http.ResponseWriter, r *http.Request) {
+// 	session, err := store.Get(r, "session-name")
+// 	if err != nil {
+// 		http.Error(w, err.Error(), http.StatusInternalServerError)
+// 		log.Println("Error getting session:", err)
+// 		return
+// 	}
+
+// 	type SurveyResult struct {
+// 		SurveyID int
+// 		Result   string
+// 		Date     string
+// 	}
+
+// 	patientID, ok := session.Values["patientID"].(int64)
+// 	if !ok {
+// 		http.Error(w, "Patient ID not found in session", http.StatusInternalServerError)
+// 		return
+// 	}
+
+// 	rows, err := db.Query("SELECT SurveyID, Result, CurDate FROM survey_results WHERE PatientID = ?", patientID)
+// 	if err != nil {
+// 		log.Println("Error querying database:", err)
+// 		return
+// 	}
+// 	defer rows.Close()
+
+// 	var results []SurveyResult
+// 	for rows.Next() {
+// 		var result SurveyResult
+// 		if err := rows.Scan(&result.SurveyID, &result.Result, &result.Date); err != nil {
+// 			log.Println("Error scanning row:", err)
+// 			return
+// 		}
+// 		results = append(results, result)
+// 	}
+
+// 	if err := rows.Err(); err != nil {
+// 		log.Println("Error iterating over rows:", err)
+// 		return
+// 	}
+
+// 	for _, result := range results {
+// 		log.Printf("ID: %d, Result: %s, Date: %s\n", result.SurveyID, result.Result, result.Date)
+// 	}
+
+// }
+
+func generateTable(w http.ResponseWriter, r *http.Request) {
+	err := makeTable(db)
+	if err != nil {
+		http.Error(w, "Ошибка при создании таблицы", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func downloadTable(w http.ResponseWriter, r *http.Request) {
+	// Открываем файл с результатами таблицы
+	file, err := os.Open("Survey_Results.xlsx")
+	if err != nil {
+		http.Error(w, "Ошибка при открытии файла таблицы", http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+
+	// Отправляем файл пользователю
+	w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	w.Header().Set("Content-Disposition", "attachment; filename=survey_results.xlsx")
+	stat, _ := file.Stat()
+	http.ServeContent(w, r, "Survey_Results.xlsx", stat.ModTime(), file)
+}
+
 func resultHandler(w http.ResponseWriter, r *http.Request) {
 	resultId := r.URL.Query().Get("result_id")
 
@@ -390,6 +463,8 @@ func main() {
 	r.HandleFunc("/choose", chooseHandler)
 	r.HandleFunc("/survey/{id}", surveyHandler)
 	r.HandleFunc("/submit_survey", submitSurveyHandler)
+	r.HandleFunc("/get_table", generateTable)
+	r.HandleFunc("/download_table", downloadTable)
 	r.HandleFunc("/result", resultHandler)
 	http.Handle("/", r)
 

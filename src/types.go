@@ -1,5 +1,7 @@
 package types
 
+import "html/template"
+
 type Answer struct {
 	AnswerID int
 	Text     string
@@ -8,13 +10,13 @@ type Answer struct {
 
 type Question struct {
 	QuestionID int
-	Title      string
+	Title      template.HTML
 	Answers    []Answer
 }
 
 type Survey struct {
 	SurveyID    int
-	Title       string
+	Title       template.HTML
 	Description string
 	Questions   []Question
 }

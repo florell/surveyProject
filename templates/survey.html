@@ -23,6 +23,9 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         #question-container {
             text-align: center;
@@ -84,11 +87,39 @@
             top: 0;
             left: 20px;
         }
-        .return-button:hover {
+        #next-button:hover {
+            background-color: #45a049;
+        }
+        #next-button {
+            margin: 20px 0; /* Adjust the margin as needed */
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%; /* Adjust the width as needed */
+            max-width: 200px; /* Optional: limit the maximum width */
+            text-align: center;
+        }
+        .next-button:hover {
             background-color: #45a049;
         }
         .question-text {
             font-weight: normal;
+        }
+        .input-answer {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #fff;
+            border: 1px solid #007bff;
+            border-radius: 5px;
+            cursor: text;
+            width: 100%; /* Adjust the width as needed */
+            max-width: 400px; /* Optional: limit the maximum width */
         }
     </style>
 </head>
@@ -97,49 +128,63 @@
 <form id="survey-form" action="/submit_survey" method="post">
     <div id="question-container">
         <input type="hidden" name="survey_id" value="{{ .Survey.SurveyID }}">
+        {{ $isZeroAnswers := true }}
         {{range $index, $question := .Survey.Questions}}
-            <div class="question" id="question{{$question.QuestionID}}" name="question{{ $question.QuestionID }}">
-                <h3>{{sum $index 1}}. <span class="question-text">{{$question.Title}}</span></h3>
-                <div class="answers">
+        <div class="question" id="question{{$question.QuestionID}}" name="question{{ $question.QuestionID }}">
+            <h3>{{sum $index 1}}. <span class="question-text">{{$question.Title}}</span></h3>
+            <div class="answers">
+                {{if gt (len $question.Answers) 0}}
+                    {{ $isZeroAnswers = false }}
                     {{range $answerIndex, $answer := $question.Answers}}
-                    <button 
-                        type="button"
-                        question="{{$question.QuestionID}}"
-                        value="{{$answer.Value}}"
-                        class="answer"
-                        data-answer-index="{{ sum $answerIndex 1}}"
-                        onclick="saveValue(this)">
-                        {{$answer.Text}}
-                    </button>
+                        <button
+                            type="button"
+                            question="{{$question.QuestionID}}"
+                            value="{{$answer.Value}}"
+                            class="answer"
+                            data-answer-index="{{ sum $answerIndex 1}}"
+                            onclick="saveValue(this)">
+                            {{$answer.Text}}
+                        </button>
                     {{end}}
-                </div>
+                {{else}}
+                    <input
+                        type="text"
+                        class="input-answer"
+                        placeholder="Количество баллов"
+                        question="{{$question.QuestionID}}">
+                {{end}}
             </div>
+        </div>
         {{end}}
     </div>
+    {{if $isZeroAnswers}}
+    <button type="button" id="next-button">Далее</button>
+    {{end}}
     <button type="button" id="prev-button" style="display:none;">Назад</button>
 </form>
 <input type="hidden" id="questionCount" name="questionCount" value="{{.QuestionCount}}">
 <input type="hidden" id="firstQuestionID" name="firstQuestionID" value="{{.FirstQuestionID}}">
 <script>
     function saveValue(button) {
-        var questionID = button.getAttribute('question');
-        var value = button.getAttribute('value');
+        let questionID = button.getAttribute('question');
+        let value = button.getAttribute('value');
         sessionStorage.setItem('question_' + questionID, value);
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        var currentQuestion = 0;
-        var questions = document.querySelectorAll('.question');
-        var prevButton = document.getElementById('prev-button');
-        var questionCount = parseInt(document.getElementById('questionCount').value);
-        var firstQuestionID = parseInt(document.getElementById('firstQuestionID').value);
+        let currentQuestion = 0;
+        let questions = document.querySelectorAll('.question');
+        let prevButton = document.getElementById('prev-button');
+        let nextButton = document.getElementById('next-button');
+        let questionCount = parseInt(document.getElementById('questionCount').value);
+        let firstQuestionID = parseInt(document.getElementById('firstQuestionID').value);
 
         function showQuestion(questionIndex) {
             if (questionIndex === questionCount) {
                 prevButton.style.display = 'none';
                 submitForm();
             } else {
-                for (var i = 0; i < questions.length; i++) {
+                for (let i = 0; i < questions.length; i++) {
                     questions[i].style.display = 'none';
                 }
                 if (questionIndex === 0) {
@@ -165,7 +210,7 @@
 
         showQuestion(currentQuestion);
 
-        var answerButtons = document.querySelectorAll('.answer');
+        let answerButtons = document.querySelectorAll('.answer');
         answerButtons.forEach(function(button) {
             button.addEventListener('click', function() {
                 nextQuestion();
@@ -175,6 +220,11 @@
         prevButton.addEventListener('click', function() {
             prevQuestion();
         });
+        if (nextButton != null) {
+            nextButton.addEventListener('click', function() {
+                nextQuestion();
+            });
+        }
 
         document.addEventListener('keydown', function(event) {
             if (event.key >= '1' && event.key <= '9') {
@@ -185,8 +235,8 @@
                     answerButton.click();
                 }
             }
-            if (event.keyCode === 8) {
-                var prevButton = document.getElementById('prev-button');
+            if (event.keyCode === 27) {
+                let prevButton = document.getElementById('prev-button');
                 prevButton.click();
             }
         });
@@ -194,14 +244,14 @@
 
     function submitForm() {
         event.preventDefault();
-        var form = document.getElementById('survey-form');
+        let form = document.getElementById('survey-form');
 
-        for (var i = 0 + parseInt(firstQuestionID.value); i < parseInt(questionCount.value) + parseInt(firstQuestionID.value); i++) {
-            var answerValue = sessionStorage.getItem('question_' + i);
+        for (let i = 0 + parseInt(firstQuestionID.value); i < parseInt(questionCount.value) + parseInt(firstQuestionID.value); i++) {
+            let answerValue = sessionStorage.getItem('question_' + i);
 
-            var hiddenInput = document.createElement('input');
+            let hiddenInput = document.createElement('input');
             hiddenInput.type = 'hidden';
-            hiddenInput.name = 'question_' + i; 
+            hiddenInput.name = 'question_' + i;
             hiddenInput.value = answerValue;
 
             form.appendChild(hiddenInput);

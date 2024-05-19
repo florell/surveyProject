@@ -270,11 +270,11 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 			questionID := strings.Split(key, "question_")[1]
 			qIDint, ok := strconv.Atoi(questionID)
 			if ok != nil {
-				log.Println(ok)
+				log.Println("r.Form - questionID:", ok)
 			}
 			intValue, ok := strconv.Atoi(values[0])
 			if ok != nil {
-				log.Println(ok)
+				log.Println("r.Form - values[0]:", ok)
 			}
 			selectedAnswers[qIDint] = intValue
 		}
@@ -321,9 +321,12 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln("Error saving results in session:", err)
 	}
 	
+	fmt.Println("Analysis:", string(analysis))
+	
 	// Prepare SQL statement
 	stmt, err := db.Prepare("INSERT INTO survey_results (PatientID, SurveyID, CurDate, Result) VALUES (?, ?, CURDATE(), ?) ON DUPLICATE KEY UPDATE CurDate = CURDATE(), Result = ?")
 	if err != nil {
+		log.Println("Error inserting result into db (prepare)", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -336,6 +339,7 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	// Execute the SQL statement
 	_, err = stmt.Exec(patientID, surveyID, string(analysis), string(analysis))
 	if err != nil {
+		log.Println("Error inserting result into db (exec)", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -348,56 +352,8 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("resultID =", resultID)
 	
 	// Redirect after successful form submission
-	http.Redirect(w, r, "/result?survey_id="+strconv.Itoa(surveyID)+"&result_id="+resultID, http.StatusSeeOther)
+	http.Redirect(w, r, "/result?survey_id="+strconv.Itoa(surveyID)+"&patient_id="+fmt.Sprintf("%d", patientID), http.StatusSeeOther)
 }
-
-// func patientLogHandler(w http.ResponseWriter, r *http.Request) {
-// 	session, err := store.Get(r, "session-name")
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		log.Println("Error getting session:", err)
-// 		return
-// 	}
-
-// 	type SurveyResult struct {
-// 		SurveyID int
-// 		Result   string
-// 		Date     string
-// 	}
-
-// 	patientID, ok := session.Values["patientID"].(int64)
-// 	if !ok {
-// 		http.Error(w, "Patient ID not found in session", http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	rows, err := db.Query("SELECT SurveyID, Result, CurDate FROM survey_results WHERE PatientID = ?", patientID)
-// 	if err != nil {
-// 		log.Println("Error querying database:", err)
-// 		return
-// 	}
-// 	defer rows.Close()
-
-// 	var results []SurveyResult
-// 	for rows.Next() {
-// 		var result SurveyResult
-// 		if err := rows.Scan(&result.SurveyID, &result.Result, &result.Date); err != nil {
-// 			log.Println("Error scanning row:", err)
-// 			return
-// 		}
-// 		results = append(results, result)
-// 	}
-
-// 	if err := rows.Err(); err != nil {
-// 		log.Println("Error iterating over rows:", err)
-// 		return
-// 	}
-
-// 	for _, result := range results {
-// 		log.Printf("ID: %d, Result: %s, Date: %s\n", result.SurveyID, result.Result, result.Date)
-// 	}
-
-// }
 
 func generateTable(w http.ResponseWriter, r *http.Request) {
 	err := makeTable(db)
@@ -425,10 +381,13 @@ func downloadTable(w http.ResponseWriter, r *http.Request) {
 }
 
 func resultHandler(w http.ResponseWriter, r *http.Request) {
-	resultId := r.URL.Query().Get("result_id")
+	patientId := r.URL.Query().Get("patient_id")
+	surveyId := r.URL.Query().Get("survey_id")
 	
 	var resD string
-	if err := db.QueryRow("SELECT Result FROM survey_results WHERE ID = ?", resultId).Scan(&resD); err != nil {
+	if err := db.QueryRow(
+		"SELECT Result FROM survey_results WHERE PatientID = ? AND SurveyID = ?", patientId, surveyId,
+	).Scan(&resD); err != nil {
 		http.Error(w, fmt.Sprintf("Error getting results from database: %s", err.Error()), http.StatusInternalServerError)
 	}
 	

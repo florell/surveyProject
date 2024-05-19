@@ -118,8 +118,8 @@
             border: 1px solid #007bff;
             border-radius: 5px;
             cursor: text;
-            width: 100%; /* Adjust the width as needed */
-            max-width: 400px; /* Optional: limit the maximum width */
+            width: 100%;
+            max-width: 400px;
         }
     </style>
 </head>
@@ -152,13 +152,17 @@
                         class="input-answer"
                         placeholder="Количество баллов"
                         question="{{$question.QuestionID}}">
+<!--                <button type="button" id="next-button"-->
+<!--                        question="{{$question.QuestionID}}"-->
+<!--                        onclick="saveValueFromField(this)">Далее</button>-->
                 {{end}}
             </div>
         </div>
         {{end}}
     </div>
     {{if $isZeroAnswers}}
-    <button type="button" id="next-button">Далее</button>
+    <button type="button" id="next-button"
+            onclick="saveValueFromFields()">Далее</button>
     {{end}}
     <button type="button" id="prev-button" style="display:none;">Назад</button>
 </form>
@@ -169,6 +173,13 @@
         let questionID = button.getAttribute('question');
         let value = button.getAttribute('value');
         sessionStorage.setItem('question_' + questionID, value);
+    }
+
+    function saveValueFromFields() {
+        let inputFields = document.querySelectorAll('.input-answer');
+        inputFields.forEach(function(field) {
+            sessionStorage.setItem('question_' + field.getAttribute('question'), field.value);
+        });
     }
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -245,8 +256,7 @@
     function submitForm() {
         event.preventDefault();
         let form = document.getElementById('survey-form');
-
-        for (let i = 0 + parseInt(firstQuestionID.value); i < parseInt(questionCount.value) + parseInt(firstQuestionID.value); i++) {
+        for (let i = parseInt(firstQuestionID.value); i < parseInt(questionCount.value) + parseInt(firstQuestionID.value); i++) {
             let answerValue = sessionStorage.getItem('question_' + i);
 
             let hiddenInput = document.createElement('input');

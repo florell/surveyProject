@@ -31,9 +31,6 @@ func FABHandler(s *types.SurveyResults) []byte {
 		result["Результат"]["description"] = "Выраженная лобная дисфункция (деменция лобного типа)"
 	}
 	
-	fmt.Println("####")
-	fmt.Println(result)
-	
 	resultJSON, err := json.Marshal(result)
 	if err != nil {
 		log.Fatalln(err)

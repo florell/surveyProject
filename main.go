@@ -435,8 +435,11 @@ func main() {
 	r.HandleFunc("/result", resultHandler)
 	http.Handle("/", r)
 	
-	fs := http.FileServer(http.Dir("templates"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	js := http.FileServer(http.Dir("src/script"))
+	css := http.FileServer(http.Dir("src/styles"))
+	
+	http.Handle("/script/", http.StripPrefix("/script/", js))
+	http.Handle("/styles/", http.StripPrefix("/styles/", css))
 	
 	srv := &http.Server{
 		Addr: ":8080",

@@ -15,7 +15,7 @@ type responseField struct {
 type responseResult struct {
 	PhysHealth    responseField `json:"Физическое здоровье"`
 	PhyslogHealth responseField `json:"Физиологическое здоровье"`
-	SocialHealth  responseField `json:"Созиальные взаимоотношения"`
+	SocialHealth  responseField `json:"Социальные взаимоотношения"`
 	Environment   responseField `json:"Окружающая среда"`
 }
 

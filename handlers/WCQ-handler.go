@@ -287,10 +287,42 @@ func ageAndSexResolver(age, score int, sex, field string) int {
 }
 
 func WCQHandler(s *types.SurveyResults) []byte {
-	result := make(map[string]map[string]int)
+	result := map[string]map[string]int{
+		"Конфронтация": {
+			"max_value": 90,
+			"value":     0,
+		},
+		"Дистанцирование": {
+			"max_value": 90,
+			"value":     0,
+		},
+		"Самоконтроль": {
+			"max_value": 90,
+			"value":     0,
+		},
+		"Поиск соц. поддержки": {
+			"max_value": 90,
+			"value":     0,
+		},
+		"Принятие ответственности": {
+			"max_value": 90,
+			"value":     0,
+		},
+		"Бегство-избегание": {
+			"max_value": 90,
+			"value":     0,
+		},
+		"Планирование решения": {
+			"max_value": 90,
+			"value":     0,
+		},
+		"Положительная переоценка": {
+			"max_value": 90,
+			"value":     0,
+		},
+	}
 	
 	for field, keysMap := range scaleWCQKeys {
-		result[field] = make(map[string]int)
 		result[field]["max_value"] = keysMap["max_value"]
 	}
 	
@@ -306,6 +338,8 @@ func WCQHandler(s *types.SurveyResults) []byte {
 	for field, resMap := range result {
 		result[field]["value"] = ageAndSexResolver(s.Age, resMap["value"], s.Sex, field)
 	}
+	
+	fmt.Println("WCQ result: ", result)
 	
 	resultJSON, err := json.Marshal(result)
 	if err != nil {

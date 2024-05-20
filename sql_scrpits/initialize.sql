@@ -4,15 +4,15 @@ USE psy_data;
 -- Create Surveys table
 CREATE TABLE IF NOT EXISTS surveys (
     ID INT AUTO_INCREMENT PRIMARY KEY,
-    Title VARCHAR(255),
-    Description VARCHAR(255)
+    Title TEXT,
+    Description TEXT
 );
 
 -- Create Questions table
 CREATE TABLE IF NOT EXISTS questions (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     SurveyID INT,
-    Title VARCHAR(1100),
+    Title TEXT,
     FOREIGN KEY (SurveyID) REFERENCES surveys(ID)
 );
 
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS questions (
 CREATE TABLE IF NOT EXISTS answers (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     QuestionID INT,
-    Text VARCHAR(255),
+    Text TEXT,
     Value INT,
     FOREIGN KEY (QuestionID) REFERENCES questions(ID)
 );
@@ -39,8 +39,9 @@ CREATE TABLE IF NOT EXISTS survey_results (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     PatientID INT,
     SurveyID INT,
-    Result JSON,
+    Result TEXT,
     CurDate Date,
+    Description TEXT,
     FOREIGN KEY (PatientID) REFERENCES patients(ID),
     FOREIGN KEY (SurveyID) REFERENCES surveys(ID),
     UNIQUE KEY unique_columns (PatientID, SurveyID)

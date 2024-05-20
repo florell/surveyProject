@@ -80,6 +80,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		session.Values["patientID"] = insertedID
 		session.Values["patientGender"] = sex
 		session.Values["patientAge"] = age
+		session.Values["patientName"] = name + " " + surname
 		
 		if err := session.Save(r, w); err != nil {
 			log.Println("Error saving cookies:", err)
@@ -111,6 +112,36 @@ func chooseHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}(rows)
 	
+	session, err := store.Get(r, "session-name")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Println("Error getting session:", err)
+		return
+	}
+	
+	patientName, ok := session.Values["patientName"].(string)
+	if !ok {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	
+	patientGender, ok := session.Values["patientGender"].(string)
+	if !ok {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	if patientGender == "male" {
+		patientGender = "мужской"
+	} else {
+		patientGender = "женский"
+	}
+	
+	patientAge, ok := session.Values["patientAge"].(string)
+	if !ok {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	
 	var surveys []types.Survey
 	for rows.Next() {
 		var survey types.Survey
@@ -123,7 +154,14 @@ func chooseHandler(w http.ResponseWriter, r *http.Request) {
 	
 	tmpl := template.Must(template.ParseFiles("templates/choose.html"))
 	
-	if err := tmpl.Execute(w, surveys); err != nil {
+	data := struct {
+		Surveys []types.Survey
+		Age     string
+		Name    string
+		Gender  string
+	}{surveys, patientAge, patientName, patientGender}
+	
+	if err := tmpl.Execute(w, data); err != nil {
 		log.Println(err)
 		return
 	}
@@ -230,18 +268,17 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	// Check if the patientID exists in the session
 	patientID, ok := session.Values["patientID"].(int64)
 	if !ok {
-		http.Error(w, "Patient ID not found in session", http.StatusInternalServerError)
-		return
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 	
 	patientGender, ok := session.Values["patientGender"].(string)
 	if !ok {
-		http.Error(w, "Patient gender not found in this session", http.StatusInternalServerError)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 	
 	patientAge, ok := session.Values["patientAge"].(string)
 	if !ok {
-		http.Error(w, "Patient age not found in this session", http.StatusInternalServerError)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 	patientAgeInt, err := strconv.Atoi(patientAge)
 	if err != nil {

@@ -10,9 +10,14 @@
 </head>
 <body>
 <div class="container">
+    <div class="user-info">
+        <h2>{{.Name}}</h2>
+        <p>Возраст: {{.Age}}</p>
+        <p>Пол: {{.Gender}}</p>
+    </div>
     <h1 class="text-center mb-4">Выберите опрос:</h1>
     <div class="row row-cols-1 row-cols-md-3">
-        {{range $i, $survey := .}}
+        {{range $i, $survey := .Surveys}}
         <div class="col mb-4">
             <div class="card text-center p-4 card-color-{{$i}}" onclick="redirectToSurvey('{{.SurveyID}}')">
                 <h5 class="card-title">{{$survey.Title}}</h5>
@@ -40,9 +45,7 @@
         </div>
     </div>
 </div>
-<!--<div class="bottom-left">-->
-<!--    <button id="downloadTableBtn" class="btn btn-secondary" onclick="downloadTable()">Скачать таблицу</button>-->
-<!--</div>-->
+
 <div class="button-container">
     <button id="downloadTableBtn" class="btn btn-secondary" onclick="downloadTable()">Скачать таблицу</button>
     <button id="relogin" class="btn btn-secondary" onclick="relogin()">Сменить пациента</button>

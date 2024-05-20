@@ -1,0 +1,76 @@
+body {
+    background-color: #f8f9fa;
+}
+.container {
+    margin: 50px auto;
+}
+.card {
+    transition: transform 0.3s;
+    border-radius: 10px; /* Закругление углов */
+    border: none; /* Убираем рамку */
+    cursor: pointer; /* Устанавливаем курсор в виде руки */
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.1); /* Тень при наведении */
+}
+.card-title {
+    color: #333; /* Цвет заголовка */
+}
+.card-text {
+    color: #666; /* Цвет текста */
+}
+/* Классы для цветов карточек */
+.card-color-0 {
+    background-color: #e4e4e4; /* Белый */
+}
+.card-color-1 {
+    background-color: #f8d7da; /* Красный */
+}
+.card-color-2 {
+    background-color: #c3e6cb; /* Зеленый */
+}
+.card-color-3 {
+    background-color: #bee5eb; /* Голубой */
+}
+.card-color-4 {
+    background-color: #fff3cd; /* Желтый */
+}
+.card-color-5 {
+    background-color: #aca6fe; /* Фиолетовый */
+}
+.card-color-6 {
+    background-color: #B2F0E8;
+}
+.card-color-7 {
+    background-color: #FFB6C1;
+}
+.card-color-8 {
+    background-color: #FFD3B5;
+}
+/* Стили для кнопки "Подробнее" */
+.more-info-btn {
+    background-color: #FFFFFF;
+    border-color: black;
+    color: black;
+}
+.more-info-btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+.close:focus,
+.close:active {
+    outline: none;
+    box-shadow: none;
+}
+.button-container {
+    display: flex;
+    justify-content: center;
+    position: fixed;
+    bottom: 10px;
+    width: 100%;
+}
+
+.button-container button {
+    margin: 0 5px; /* Значительно увеличенный отступ между кнопками */
+}

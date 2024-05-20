@@ -49,6 +49,7 @@ func pushTest(db *sql.DB) {
 	fmt.Println(files)
 	
 	for _, file := range files {
+		fmt.Println(file)
 		jsonFile, err := os.Open(file)
 		if err != nil {
 			log.Fatalln(err)
@@ -58,7 +59,7 @@ func pushTest(db *sql.DB) {
 		
 		var survey types.Survey
 		
-		if err := json.Unmarshal([]byte(byteValue), &survey); err != nil {
+		if err := json.Unmarshal(byteValue, &survey); err != nil {
 			panic(err)
 		}
 		

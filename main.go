@@ -27,6 +27,21 @@ var db *sql.DB
 
 var store = sessions.NewCookieStore([]byte("merogrek"))
 
+func checkSessionData(session *sessions.Session) bool {
+	patientID, ok1 := session.Values["patientID"].(int64)
+	
+	_, ok2 := session.Values["patientGender"].(string)
+	
+	_, ok3 := session.Values["patientAge"].(string)
+	
+	var count int
+	if err := db.QueryRow("SELECT COUNT(*) FROM patients WHERE id = ?", patientID).Scan(&count); err != nil {
+		log.Fatalln("Error while checking session data:", err)
+	}
+	
+	return ok1 && ok2 && ok3 && (count != 0)
+}
+
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	session, err := store.Get(r, "session-name")
 	if err != nil {
@@ -80,6 +95,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		session.Values["patientID"] = insertedID
 		session.Values["patientGender"] = sex
 		session.Values["patientAge"] = age
+		session.Values["patientName"] = name + " " + surname
 		
 		if err := session.Save(r, w); err != nil {
 			log.Println("Error saving cookies:", err)
@@ -111,6 +127,40 @@ func chooseHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}(rows)
 	
+	session, err := store.Get(r, "session-name")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Println("Error getting session:", err)
+		return
+	}
+	
+	if !checkSessionData(session) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
+	
+	patientName, ok := session.Values["patientName"].(string)
+	if !ok {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	
+	patientGender, ok := session.Values["patientGender"].(string)
+	if !ok {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	if patientGender == "male" {
+		patientGender = "мужской"
+	} else {
+		patientGender = "женский"
+	}
+	
+	patientAge, ok := session.Values["patientAge"].(string)
+	if !ok {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	
 	var surveys []types.Survey
 	for rows.Next() {
 		var survey types.Survey
@@ -123,7 +173,14 @@ func chooseHandler(w http.ResponseWriter, r *http.Request) {
 	
 	tmpl := template.Must(template.ParseFiles("templates/choose.html"))
 	
-	if err := tmpl.Execute(w, surveys); err != nil {
+	data := struct {
+		Surveys []types.Survey
+		Age     string
+		Name    string
+		Gender  string
+	}{surveys, patientAge, patientName, patientGender}
+	
+	if err := tmpl.Execute(w, data); err != nil {
 		log.Println(err)
 		return
 	}
@@ -230,18 +287,17 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	// Check if the patientID exists in the session
 	patientID, ok := session.Values["patientID"].(int64)
 	if !ok {
-		http.Error(w, "Patient ID not found in session", http.StatusInternalServerError)
-		return
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 	
 	patientGender, ok := session.Values["patientGender"].(string)
 	if !ok {
-		http.Error(w, "Patient gender not found in this session", http.StatusInternalServerError)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 	
 	patientAge, ok := session.Values["patientAge"].(string)
 	if !ok {
-		http.Error(w, "Patient age not found in this session", http.StatusInternalServerError)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 	patientAgeInt, err := strconv.Atoi(patientAge)
 	if err != nil {
@@ -321,8 +377,6 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln("Error saving results in session:", err)
 	}
 	
-	fmt.Println("Analysis:", string(analysis))
-	
 	// Prepare SQL statement
 	stmt, err := db.Prepare("INSERT INTO survey_results (PatientID, SurveyID, CurDate, Result) VALUES (?, ?, CURDATE(), ?) ON DUPLICATE KEY UPDATE CurDate = CURDATE(), Result = ?")
 	if err != nil {
@@ -336,6 +390,7 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}(stmt)
 	
+	fmt.Println("Analysis:", string(analysis))
 	// Execute the SQL statement
 	_, err = stmt.Exec(patientID, surveyID, string(analysis), string(analysis))
 	if err != nil {
@@ -343,13 +398,6 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	
-	var resultID string
-	if err := db.QueryRow("SELECT MAX(id) FROM survey_results").Scan(&resultID); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	fmt.Println("resultID =", resultID)
 	
 	// Redirect after successful form submission
 	http.Redirect(w, r, "/result?survey_id="+strconv.Itoa(surveyID)+"&patient_id="+fmt.Sprintf("%d", patientID), http.StatusSeeOther)
@@ -392,8 +440,6 @@ func resultHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	tmpl := template.Must(template.ParseFiles("templates/results.html"))
-	
-	fmt.Println("___", resD, "___")
 	
 	if err := tmpl.Execute(w, resD); err != nil {
 		log.Fatal(err)

@@ -115,7 +115,7 @@ func makeConclusion(db *sql.DB, patientID string) error {
 				for _, k := range sk {
 					if s, ok := v[k].(float64); ok && k == "value" {
 						ss := strconv.FormatFloat(s, 'f', 0, 64)
-						fr[1] = ss + " / "
+						fr[1] = ss + "/"
 					} else if s, ok := v[k].(float64); ok && k == "max_value" {
 						ss := strconv.FormatFloat(s, 'f', 0, 64)
 						fr[2] = ss

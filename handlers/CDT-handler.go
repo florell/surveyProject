@@ -15,13 +15,13 @@ func CDTHandler(s *types.SurveyResults) []byte {
 			"description": "",
 		},
 	}
-	
+
 	if s.Picked[398] >= 10 {
-		result["Тест рисования часов"]["description"] = "Наличие выраженных нарушений памяти"
-	} else {
 		result["Тест рисования часов"]["description"] = "Нарушений оптико-пространственного гнозиса не выявлено, конструктивный праксис сохранен"
+	} else {
+		result["Тест рисования часов"]["description"] = "Наличие выраженных нарушений памяти"
 	}
-	
+
 	resultJSON, err := json.Marshal(result)
 	if err != nil {
 		log.Fatalln(err)

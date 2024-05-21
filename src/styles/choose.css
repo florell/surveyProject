@@ -48,6 +48,18 @@ body {
 .card-color-8 {
     background-color: #FFD3B5;
 }
+.card-color-9 {
+    background-color: #d8bfd8;
+}
+.card-color-10 {
+    background-color: rgb(212, 245, 43);
+}
+.card-color-11 {
+    background-color: #c8a2c8;
+}
+.card-color-12 {
+    background-color: #e6e6fa;
+}
 /* Стили для кнопки "Подробнее" */
 .more-info-btn {
     background-color: #FFFFFF;
@@ -72,16 +84,16 @@ body {
 }
 
 .button-container button {
-    margin: 0 5px; /* Значительно увеличенный отступ между кнопками */
+    margin: 0 5px;
 }
 
 .user-info {
     margin-top: 20px;
     margin-bottom: 40px;
     padding: 20px;
-    background-color: #b2b2b2;
+    background-color: #FFFFFF;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Увеличиваем значение альфа-канала до 0.4 */
     text-align: center;
 }
 .user-info h2 {

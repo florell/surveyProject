@@ -39,6 +39,14 @@ func FilePathWalkDir(root string) ([]string, error) {
 }
 
 func pushTest(db *sql.DB) {
+	var count int
+	if err := db.QueryRow("SELECT COUNT(*) FROM surveys").Scan(&count); err != nil {
+		log.Fatalln("Error while counting surveys in db:", err)
+	}
+	if count != 0 {
+		return
+	}
+	
 	files, err := FilePathWalkDir("surveys")
 	if err != nil {
 		log.Fatalln(err)

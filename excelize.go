@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
-	
+
 	"github.com/360EntSecGroup-Skylar/excelize"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -41,7 +41,7 @@ func makeTable(db *sql.DB) error {
 		return err
 	}
 	defer rows.Close()
-	
+
 	xlsx := excelize.NewFile()
 	sheetName := "Результаты опроса"
 	xlsx.SetSheetName("Sheet1", sheetName)
@@ -50,7 +50,7 @@ func makeTable(db *sql.DB) error {
 	startRow := 2
 	h := 4
 	styles := []int{}
-	
+
 	style1, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#87CEFA"],"pattern":1}}`)
 	style2, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#FFB6C1"],"pattern":1}}`)
 	style3, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#98FB98"],"pattern":1}}`)
@@ -61,7 +61,7 @@ func makeTable(db *sql.DB) error {
 	style8, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#DDA0DD"],"pattern":1}}`)
 	style9, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#FFA07A"],"pattern":1}}`)
 	style10, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#FFA07A"],"pattern":1}}`)
-	
+
 	styles = append(styles, style1)
 	styles = append(styles, style2)
 	styles = append(styles, style3)
@@ -72,7 +72,7 @@ func makeTable(db *sql.DB) error {
 	styles = append(styles, style8)
 	styles = append(styles, style9)
 	styles = append(styles, style10)
-	
+
 	xlsx.SetCellValue(sheetName, "A1", "Пациенты")
 	xlsx.MergeCell(sheetName, "A1", "D1")
 	xlsx.SetCellValue(sheetName, "A2", "Имя")
@@ -80,7 +80,7 @@ func makeTable(db *sql.DB) error {
 	xlsx.SetCellValue(sheetName, "C2", "Возраст")
 	xlsx.SetCellValue(sheetName, "D2", "Пол")
 	xlsx.SetCellStyle("Sheet1", "A1", "D2", styles[0])
-	
+
 	for rows.Next() {
 		s := struct {
 			ID        int
@@ -89,28 +89,28 @@ func makeTable(db *sql.DB) error {
 			resultStr string
 			curDate   string
 		}{}
-		
+
 		err := rows.Scan(&s.ID, &s.patientID, &s.surveyID, &s.resultStr, &s.curDate)
 		if err != nil {
 			return err
 		}
-		
+
 		surveyName, err := getSurveyName(db, s.surveyID)
 		if err != nil {
 			return err
 		}
-		
+
 		patient, err := getPatient(db, s.patientID)
 		if err != nil {
 			return err
 		}
-		
+
 		var result map[string]interface{}
 		err = json.Unmarshal([]byte(s.resultStr), &result)
 		if err != nil {
 			return err
 		}
-		
+
 		lastRow, exists := patientLastRow[s.patientID]
 		if !exists {
 			lastRow = len(patientLastRow) + 1 + startRow
@@ -121,19 +121,19 @@ func makeTable(db *sql.DB) error {
 			} else {
 				ruSex = "женский"
 			}
-			
+
 			xlsx.SetCellValue(sheetName, "A"+strconv.Itoa(lastRow), patient.Name)
 			xlsx.SetCellValue(sheetName, "B"+strconv.Itoa(lastRow), patient.Surname)
 			xlsx.SetCellValue(sheetName, "C"+strconv.Itoa(lastRow), patient.Age)
 			xlsx.SetCellValue(sheetName, "D"+strconv.Itoa(lastRow), ruSex)
 		}
-		
+
 		columnIndex, exists := surveyColumns[surveyName]
 		if !exists {
-			
+
 			columnIndex = h
 			surveyColumns[surveyName] = columnIndex
-			
+
 			var t int
 			startCell := excelize.ToAlphaString(columnIndex) + "1"
 			if s.surveyID != 6 {
@@ -143,7 +143,7 @@ func makeTable(db *sql.DB) error {
 			}
 			endCell := excelize.ToAlphaString(columnIndex+t) + strconv.Itoa(1)
 			xlsx.SetCellStyle("Sheet1", startCell, excelize.ToAlphaString(columnIndex+t)+strconv.Itoa(2), styles[s.surveyID])
-			
+
 			xlsx.SetCellValue(sheetName, startCell, surveyName)
 			xlsx.MergeCell(sheetName, startCell, endCell)
 			h += len(result)
@@ -182,11 +182,11 @@ func makeTable(db *sql.DB) error {
 			}
 		}
 	}
-	
+
 	if err := xlsx.SaveAs("Survey_Results.xlsx"); err != nil {
 		return err
 	}
-	
+
 	return err
-	
+
 }

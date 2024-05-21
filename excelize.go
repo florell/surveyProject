@@ -49,18 +49,21 @@ func makeTable(db *sql.DB) error {
 	surveyColumns := make(map[string]int)
 	startRow := 2
 	h := 4
-	styles := []int{}
+	styles := make([]int, 0)
 
-	style1, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#87CEFA"],"pattern":1}}`)
-	style2, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#FFB6C1"],"pattern":1}}`)
-	style3, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#98FB98"],"pattern":1}}`)
-	style4, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#FFD700"],"pattern":1}}`)
-	style5, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#FFA07A"],"pattern":1}}`)
-	style6, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#FFE4C4"],"pattern":1}}`)
-	style7, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#98FB98"],"pattern":1}}`)
-	style8, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#DDA0DD"],"pattern":1}}`)
-	style9, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#FFA07A"],"pattern":1}}`)
-	style10, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#FFA07A"],"pattern":1}}`)
+	style1, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#e4e4e4"],"pattern":1}}`)
+	style2, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#f8d7da"],"pattern":1}}`)
+	style3, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#c3e6cb"],"pattern":1}}`)
+	style4, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#bee5eb"],"pattern":1}}`)
+	style5, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#fff3cd"],"pattern":1}}`)
+	style6, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#aca6fe"],"pattern":1}}`)
+	style7, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#B2F0E8"],"pattern":1}}`)
+	style8, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#FFB6C1"],"pattern":1}}`)
+	style9, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#FFD3B5"],"pattern":1}}`)
+	style10, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#d8bfd8"],"pattern":1}}`)
+	style11, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#D4F52BFF"],"pattern":1}}`)
+	style12, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#c8a2c8"],"pattern":1}}`)
+	style13, _ := xlsx.NewStyle(`{"fill":{"type":"pattern","color":["#e6e6fa"],"pattern":1}}`)
 
 	styles = append(styles, style1)
 	styles = append(styles, style2)
@@ -72,6 +75,9 @@ func makeTable(db *sql.DB) error {
 	styles = append(styles, style8)
 	styles = append(styles, style9)
 	styles = append(styles, style10)
+	styles = append(styles, style11)
+	styles = append(styles, style12)
+	styles = append(styles, style13)
 
 	xlsx.SetCellValue(sheetName, "A1", "Пациенты")
 	xlsx.MergeCell(sheetName, "A1", "D1")

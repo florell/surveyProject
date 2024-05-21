@@ -24,7 +24,7 @@ func CDTHandler(s *types.SurveyResults) []byte {
 	if s.Picked[398] >= 10 {
 		result.Description = "Нарушений оптико-пространственного гнозиса не выявлено, конструктивный праксис сохранен"
 	} else {
-		result.Description = "Наличие выраженных нарушений памяти"
+		result.Description = "Наличие когнитивных нарушений"
 	}
 
 	resultJSON, err := json.Marshal(result)

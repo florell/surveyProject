@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Выбор опроса</title>
-    <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/styles/choose.css">
 </head>
@@ -12,10 +11,10 @@
 <div class="container">
     <div class="user-info">
         <h2>{{.Name}}</h2>
-        <p>Возраст: {{.Age}}</p>
-        <p>Пол: {{.Gender}}</p>
+        <p><b>Возраст:</b> {{.Age}}</p>
+        <p><b>Пол</b>: {{.Gender}}</p>
     </div>
-    <h1 class="text-center mb-4">Выберите опрос:</h1>
+    <!--<h1 class="text-center mb-4">Выберите опрос:</h1>-->
     <div class="row row-cols-1 row-cols-md-3">
         {{range $i, $survey := .Surveys}}
         <div class="col mb-4">
@@ -29,7 +28,6 @@
     </div>
 </div>
 
-<!-- Modal -->
 <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -40,7 +38,6 @@
                 </button>
             </div>
             <div class="modal-body" id="modalBody">
-                <!-- Description will be loaded here -->
             </div>
         </div>
     </div>
@@ -51,7 +48,6 @@
     <button id="relogin" class="btn btn-secondary" onclick="relogin()">Сменить пациента</button>
 </div>
 
-<!-- Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script src="/script/choose.js"></script>

@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"flag"
 	"fmt"
 	"html/template"
 	"log"
@@ -367,6 +366,14 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		analysis = handlers.MMSEHandler(&surveyResults)
 	case 9:
 		analysis = handlers.CDTHandler(&surveyResults)
+	case 10:
+		analysis = handlers.VECHandler(&surveyResults)
+	case 11:
+		analysis = handlers.ACEHandler(&surveyResults)
+	case 12:
+		analysis = handlers.SFTHandler(&surveyResults)
+	case 13:
+		analysis = handlers.PFTHandler(&surveyResults)
 	default:
 		log.Println("Survey ID is not supported:", surveyID)
 		http.Error(w, fmt.Sprintf("Survey ID is not supported: %d", surveyID), http.StatusBadRequest)
@@ -459,17 +466,7 @@ func main() {
 		}
 	}(db)
 	
-	pushFlag := flag.Bool("push", false, "Use this flag to push")
-	excFlag := flag.Bool("excel", false, "Use this flag to create an excel table")
-	flag.Parse()
-	if *pushFlag {
-		pushTest(db)
-		return
-	}
-	if *excFlag {
-		makeTable(db)
-		return
-	}
+	pushTest(db)
 	
 	r := mux.NewRouter()
 	r.HandleFunc("/", indexHandler)

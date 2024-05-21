@@ -26,6 +26,26 @@ function downloadTable() {
     });
 }
 
+function downloadConclusion(id) {
+    $.ajax({
+        url: '/get_conclusion?patient_id=' + id,
+        type: 'GET',
+        success: function () {
+            // Создаем скрытую ссылку для скачивания файла
+            const link = document.createElement('a');
+            link.href = '/download_conclusion?patient_id=' + id;
+            link.download = 'conclusion_' + id + '.docx';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        },
+        error: function () {
+            alert('Ошибка при создании заключения.');
+        }
+    });
+}
+
+
 function relogin(url) {
     window.location.href = "/";
 }

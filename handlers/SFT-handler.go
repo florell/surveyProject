@@ -8,8 +8,8 @@ import (
 
 type SFTResult struct {
 	Result struct {
-		Value    int
-		MaxValue int
+		Value    int `json:"value"`
+		MaxValue int `json:"max_value"`
 	} `json:"Количество слов"`
 	Description string `json:"description"`
 }
@@ -17,25 +17,25 @@ type SFTResult struct {
 func SFTHandler(s *types.SurveyResults) []byte {
 	result := SFTResult{
 		Result: struct {
-			Value    int
-			MaxValue int
+			Value    int `json:"value"`
+			MaxValue int `json:"max_value"`
 		}{0, -1},
 		Description: "",
 	}
-	
+
 	for _, value := range s.Picked {
 		result.Result.Value = value
 	}
-	
+
 	switch {
 	case result.Result.Value >= 18:
-		result.Description = "норма"
+		result.Description = "Норма"
 	case result.Result.Value >= 12 && result.Result.Value <= 17:
-		result.Description = "умеренное когнитивное снижение"
+		result.Description = "Умеренное когнитивное снижение"
 	case result.Result.Value <= 11:
-		result.Description = "выраженное когнитивное снижение"
+		result.Description = "Выраженное когнитивное снижение"
 	}
-	
+
 	resultJSON, err := json.Marshal(result)
 	if err != nil {
 		log.Fatalln(err)

@@ -427,6 +427,13 @@ func generateTable(w http.ResponseWriter, r *http.Request) {
 }
 
 func downloadTable(w http.ResponseWriter, r *http.Request) {
+	defer func(name string) {
+		err := os.Remove(name)
+		if err != nil {
+			log.Println(fmt.Sprintf("Error deleting %s file:", "Survey_Results.xlsx"), err)
+		}
+	}("Survey_Results.xlsx")
+
 	// Открываем файл с результатами таблицы
 	file, err := os.Open("Survey_Results.xlsx")
 	if err != nil {
@@ -455,6 +462,14 @@ func generateConclusion(w http.ResponseWriter, r *http.Request) {
 func downloadConclusion(w http.ResponseWriter, r *http.Request) {
 	patientId := r.URL.Query().Get("patient_id")
 	fileName := "conclusion_" + patientId + ".docx"
+
+	defer func(name string) {
+		err := os.Remove(name)
+		if err != nil {
+			log.Println(fmt.Sprintf("Error deleting %s file:", fileName), err)
+		}
+	}(fileName)
+
 	file, err := os.Open(fileName)
 	if err != nil {
 		http.Error(w, "Ошибка при открытии файла заключения", http.StatusInternalServerError)

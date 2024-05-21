@@ -8,34 +8,34 @@ import (
 
 type PFTResult struct {
 	Result struct {
-		Value    int
-		MaxValue int
+		Value    int `json:"value"`
+		MaxValue int `json:"max_value"`
 	} `json:"Количество слов"`
 	Description string `json:"description"`
 }
 
 func PFTHandler(s *types.SurveyResults) []byte {
-	result := SFTResult{
+	result := PFTResult{
 		Result: struct {
-			Value    int
-			MaxValue int
+			Value    int `json:"value"`
+			MaxValue int `json:"max_value"`
 		}{0, -1},
 		Description: "",
 	}
-	
+
 	for _, value := range s.Picked {
 		result.Result.Value = value
 	}
-	
+
 	switch {
 	case result.Result.Value >= 12:
-		result.Description = "норма"
+		result.Description = "Норма"
 	case result.Result.Value >= 9 && result.Result.Value <= 11:
-		result.Description = "умеренное когнитивное снижение"
+		result.Description = "Умеренное когнитивное снижение"
 	case result.Result.Value <= 8:
-		result.Description = "выраженное когнитивное снижение"
+		result.Description = "Выраженное когнитивное снижение"
 	}
-	
+
 	resultJSON, err := json.Marshal(result)
 	if err != nil {
 		log.Fatalln(err)

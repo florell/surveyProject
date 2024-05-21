@@ -2,26 +2,31 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	types "psychward/src"
 )
 
+type CDTResult struct {
+}
+
 func CDTHandler(s *types.SurveyResults) []byte {
-	result := map[string]map[string]string{
-		"Тест рисования часов": {
-			"value":       fmt.Sprintf("%d", s.Picked[398]),
-			"max_value":   "10",
-			"description": "",
-		},
-	}
-	
+	result := struct {
+		Result struct {
+			Value    int `json:"value"`
+			MaxValue int `json:"max_value"`
+		} `json:"Количество баллов"`
+		Description string `json:"description"`
+	}{struct {
+		Value    int `json:"value"`
+		MaxValue int `json:"max_value"`
+	}{Value: s.Picked[398], MaxValue: -1}, ""}
+
 	if s.Picked[398] >= 10 {
-		result["Тест рисования часов"]["description"] = "Наличие выраженных нарушений памяти"
+		result.Description = "Нарушений оптико-пространственного гнозиса не выявлено, конструктивный праксис сохранен"
 	} else {
-		result["Тест рисования часов"]["description"] = "Нарушений оптико-пространственного гнозиса не выявлено, конструктивный праксис сохранен"
+		result.Description = "Наличие выраженных нарушений памяти"
 	}
-	
+
 	resultJSON, err := json.Marshal(result)
 	if err != nil {
 		log.Fatalln(err)

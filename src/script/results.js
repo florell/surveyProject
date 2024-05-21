@@ -22,38 +22,80 @@ function renderProgressBars(data) {
                         </div>
                     </div>`;
                 featureProgressContainer.innerHTML += codeHTML;
+            } else if (key === 'description') {
+                // Create a separate block for 'description'
+                const descriptionHTML = `
+                    <div>
+                        <h2>Описание результата</h2>
+                        <p>${feature}</p>
+                    </div>`;
+                featureProgressContainer.innerHTML += descriptionHTML;
             } else {
                 // For other keys, continue as before
-                let progress = (feature.value / feature.max_value) * 100;
-                if (progress < 10 || feature.value == null) {
-                    progress = 10;
-                }
-                if (progress >= 100) {
-                    progress = 92;
-                }
-                const hue = (progress / 100) * 120;
+                let progressBarHTML
+                console.log(feature.value)
+                if (feature.max_value === -1 || feature.max_value === undefined) {
+                    console.log(-1)
+                    let progress = (feature.value / 20) * 100;
+                    if (progress < 10 || feature.value == null) {
+                        progress = 10;
+                    }
+                    if (progress >= 100) {
+                        progress = 92;
+                    }
+                    const hue = (progress / 100) * 120;
 
-                let percent_string = "";
-                if (feature.percent != null) {
-                    percent_string = " (" + feature.percent.toFixed(2) + "%) "
-                }
+                    let value = 0;
+                    if (feature.value != null) {
+                        value = feature.value;
+                    }
+                    let result_string = value;
 
-                let t_score_string = "";
-                if (feature.tscore != null) {
-                    t_score_string = " (" + feature.tscore + " Т) ";
-                }
+                    if (feature.value === null) {
+                        feature.value = 0
+                    }
 
-                let value = 0;
-                if (feature.value != null) {
-                    value = feature.value;
-                }
-                let result_string = value + percent_string + t_score_string;
+                    progressBarHTML = `
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-label">${key}</div>
+                        <div class="progress-bar">
+                            <div class="progress-bar-gray"></div>
+                            <div class="progress-bar-inner" style="--hue: ${hue}; width: ${progress}%;">
+                                ${result_string}
+                            </div>
+                        </div>
+                    </div>`;
+                } else {
+                    let progress = (feature.value / feature.max_value) * 100;
+                    if (progress < 10 || feature.value == null) {
+                        progress = 10;
+                    }
+                    if (progress >= 100) {
+                        progress = 92;
+                    }
+                    const hue = (progress / 100) * 120;
 
-                if (feature.value === null) {
-                    feature.value = 0
-                }
+                    let percent_string = "";
+                    if (feature.percent != null) {
+                        percent_string = " (" + feature.percent.toFixed(2) + "%) "
+                    }
 
-                const progressBarHTML = `
+                    let t_score_string = "";
+                    if (feature.tscore != null) {
+                        t_score_string = " (" + feature.tscore + " Т) ";
+                    }
+
+                    let value = 0;
+                    if (feature.value != null) {
+                        value = feature.value;
+                    }
+                    let result_string = value + percent_string + t_score_string;
+
+                    if (feature.value === null) {
+                        feature.value = 0
+                    }
+
+                    progressBarHTML = `
                     <div class="progress-bar-container">
                         <div class="progress-bar-label">${key}</div>
                         <div class="progress-bar">
@@ -65,6 +107,8 @@ function renderProgressBars(data) {
 
                         </div>
                     </div>`;
+                }
+
                 if (key === 'Feature progress') {
                     featureProgressContainer.innerHTML += progressBarHTML;
                 } else {

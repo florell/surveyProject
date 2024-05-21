@@ -2,35 +2,37 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	types "psychward/src"
 )
 
 func FABHandler(s *types.SurveyResults) []byte {
-	result := map[string]map[string]string{
-		"Результат": {
-			"value":       "0",
-			"max_value":   "18",
-			"description": "",
-		},
-	}
-	
+	result := struct {
+		Overall struct {
+			Value    int `json:"value"`
+			MaxValue int `json:"max_value"`
+		} `json:"Количество баллов"`
+		Description string `json:"description"`
+	}{struct {
+		Value    int `json:"value"`
+		MaxValue int `json:"max_value"`
+	}{0, 18}, ""}
+
 	count := 0
 	for _, answer := range s.Picked {
 		count += answer
 	}
-	result["Результат"]["value"] = fmt.Sprintf("%d", count)
-	
+	result.Overall.Value = count
+
 	switch {
 	case count >= 16 && count <= 18:
-		result["Результат"]["description"] = "Нормальная лобная функция"
+		result.Description = "Нормальная лобная функция"
 	case count >= 12 && count <= 15:
-		result["Результат"]["description"] = "Умеренная лобная дисфункция (легкие когнитивные расстройства)"
+		result.Description = "Умеренная лобная дисфункция (легкие когнитивные расстройства)"
 	case count < 12:
-		result["Результат"]["description"] = "Выраженная лобная дисфункция (деменция лобного типа)"
+		result.Description = "Выраженная лобная дисфункция (деменция лобного типа)"
 	}
-	
+
 	resultJSON, err := json.Marshal(result)
 	if err != nil {
 		log.Fatalln(err)

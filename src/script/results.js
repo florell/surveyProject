@@ -7,6 +7,7 @@ function renderProgressBars(data) {
     const progressBarContainer = document.getElementById('progress-bars');
 
     for (const key in data) {
+        console.log(key)
         if (data.hasOwnProperty(key)) {
             const feature = data[key];
             // Check if the key is 'code'
@@ -22,6 +23,14 @@ function renderProgressBars(data) {
                         </div>
                     </div>`;
                 featureProgressContainer.innerHTML += codeHTML;
+            } else if (key === 'description') {
+                // Create a separate block for 'description'
+                const descriptionHTML = `
+                    <div>
+                        <h2>Описание результата</h2>
+                        <p>${feature}</p>
+                    </div>`;
+                featureProgressContainer.innerHTML += descriptionHTML;
             } else {
                 // For other keys, continue as before
                 let progress = (feature.value / feature.max_value) * 100;

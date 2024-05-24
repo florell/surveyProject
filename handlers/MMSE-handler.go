@@ -2,39 +2,46 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	types "psychward/src"
 )
 
+type MMSEResult struct {
+	Result struct {
+		Value    int `json:"value"`
+		MaxValue int `json:"max_value"`
+	} `json:"Количество слов"`
+	Description string `json:"description"`
+}
+
 func MMSEHandler(s *types.SurveyResults) []byte {
-	result := map[string]map[string]string{
-		"Результат": {
-			"value":       "0",
-			"max_value":   "30",
-			"description": "",
-		},
+	result := MMSEResult{
+		Result: struct {
+			Value    int `json:"value"`
+			MaxValue int `json:"max_value"`
+		}{0, 30},
+		Description: "",
 	}
-	
+
 	count := 0
 	for _, answer := range s.Picked {
 		count += answer
 	}
-	result["Результат"]["value"] = fmt.Sprintf("%d", count)
-	
+	result.Result.Value = count
+
 	switch {
 	case count >= 28 && count <= 30:
-		result["Результат"]["description"] = "Нет нарушений когнитивных функций"
+		result.Description = "Нет нарушений когнитивных функций"
 	case count >= 24 && count <= 27:
-		result["Результат"]["description"] = "Преддементные когнитивные нарушения"
+		result.Description = "Преддементные когнитивные нарушения"
 	case count >= 20 && count <= 23:
-		result["Результат"]["description"] = "Деменция легкой степени выраженности"
+		result.Description = "Деменция легкой степени выраженности"
 	case count >= 11 && count <= 19:
-		result["Результат"]["description"] = "Деменция умеренной степени выраженности"
+		result.Description = "Деменция умеренной степени выраженности"
 	case count <= 10:
-		result["Результат"]["description"] = "Тяжелая деменция"
+		result.Description = "Тяжелая деменция"
 	}
-	
+
 	resultJSON, err := json.Marshal(result)
 	if err != nil {
 		log.Fatalln(err)

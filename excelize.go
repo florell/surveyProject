@@ -142,17 +142,53 @@ func makeTable(db *sql.DB) error {
 
 			var t int
 			startCell := excelize.ToAlphaString(columnIndex) + "1"
-			if s.surveyID != 6 {
+			endCell := startCell
+			switch {
+			case s.surveyID == 1:
+				t = len(result)
+				endCell = excelize.ToAlphaString(columnIndex+t-1) + strconv.Itoa(1)
+			case s.surveyID == 2:
+				t = len(result)
+				endCell = excelize.ToAlphaString(columnIndex+t-1) + strconv.Itoa(1)
+			case s.surveyID == 3:
+				t = len(result)
+				endCell = excelize.ToAlphaString(columnIndex+t-1) + strconv.Itoa(1)
+			case s.surveyID == 4:
 				t = len(result) - 1
-			} else {
-				t = len(result)*2 - 3
+				endCell = excelize.ToAlphaString(columnIndex+t-1) + strconv.Itoa(1)
+			case s.surveyID == 5:
+				t = len(result)
+				endCell = excelize.ToAlphaString(columnIndex+t-1) + strconv.Itoa(1)
+			case s.surveyID == 6:
+				t = len(result)*2 - 2
+				endCell = excelize.ToAlphaString(columnIndex+t-1) + strconv.Itoa(1)
+			case s.surveyID == 7:
+				t = len(result) - 1
+				endCell = excelize.ToAlphaString(columnIndex+t-1) + strconv.Itoa(1)
+			case s.surveyID == 8:
+				t = len(result) - 1
+				endCell = excelize.ToAlphaString(columnIndex+t-1) + strconv.Itoa(1)
+			case s.surveyID == 9:
+				t = len(result) - 1
+				endCell = excelize.ToAlphaString(columnIndex+t-1) + strconv.Itoa(1)
+			case s.surveyID == 10:
+				t = len(result) - 1
+				endCell = excelize.ToAlphaString(columnIndex+t-1) + strconv.Itoa(1)
+			case s.surveyID == 11:
+				t = len(result) - 1
+				endCell = excelize.ToAlphaString(columnIndex+t-1) + strconv.Itoa(1)
+			case s.surveyID == 12:
+				t = len(result) - 1
+				endCell = excelize.ToAlphaString(columnIndex+t-1) + strconv.Itoa(1)
+			case s.surveyID == 13:
+				t = len(result) - 1
+				endCell = excelize.ToAlphaString(columnIndex+t-1) + strconv.Itoa(1)
 			}
-			endCell := excelize.ToAlphaString(columnIndex+t) + strconv.Itoa(1)
-			xlsx.SetCellStyle("Sheet1", startCell, excelize.ToAlphaString(columnIndex+t)+strconv.Itoa(2), styles[s.surveyID])
+			xlsx.SetCellStyle("Sheet1", startCell, excelize.ToAlphaString(columnIndex+t-1)+strconv.Itoa(2), styles[s.surveyID-1])
 
 			xlsx.SetCellValue(sheetName, startCell, surveyName)
 			xlsx.MergeCell(sheetName, startCell, endCell)
-			h += len(result)
+			h += t
 		}
 		sres := []string{}
 		for o := range result {
@@ -180,6 +216,10 @@ func makeTable(db *sql.DB) error {
 						colInd++
 					}
 				}
+			case float64:
+				xlsx.SetCellValue(sheetName, excelize.ToAlphaString(colInd)+strconv.Itoa(2), value)
+				xlsx.SetCellValue(sheetName, excelize.ToAlphaString(colInd)+strconv.Itoa(lastRow), int(v))
+				colInd++
 			}
 		}
 		if s.surveyID == 6 {

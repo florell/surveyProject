@@ -4,12 +4,7 @@ function saveValue(button) {
     sessionStorage.setItem('question_' + questionID, value);
 }
 
-function saveValueFromFields() {
-    let inputFields = document.querySelectorAll('.input-answer');
-    inputFields.forEach(function(field) {
-        sessionStorage.setItem('question_' + field.getAttribute('question'), field.value);
-    });
-}
+let nextQuestion;
 
 document.addEventListener("DOMContentLoaded", function() {
     let currentQuestion = 0;
@@ -36,10 +31,10 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    function nextQuestion() {
+    nextQuestion = function() { 
         currentQuestion++;
         showQuestion(currentQuestion);
-    }
+    };
 
     function prevQuestion() {
         if (currentQuestion > 0) {
@@ -60,11 +55,7 @@ document.addEventListener("DOMContentLoaded", function() {
     prevButton.addEventListener('click', function() {
         prevQuestion();
     });
-    if (nextButton != null) {
-        nextButton.addEventListener('click', function() {
-            nextQuestion();
-        });
-    }
+
 
     document.addEventListener('keydown', function(event) {
         if (event.key >= '1' && event.key <= '9') {
@@ -97,4 +88,40 @@ function submitForm() {
     }
 
     form.submit();
+}
+
+function saveValueFromFields() {
+    let inputFields = document.querySelectorAll('.input-answer');
+    let isValid = true;
+    // убираем предыдущие уведомления перед переходом
+    document.querySelectorAll('.error-message').forEach(function(errorDiv) {
+        errorDiv.textContent = '';
+    });
+    for (let i = 0; i < inputFields.length; i++) {
+        let field = inputFields[i];
+        let value = parseInt(field.value);
+        let min = parseInt(field.getAttribute('min'));
+        let max = parseInt(field.getAttribute('max'));
+        let errorDiv = document.getElementById('error-' + field.getAttribute('question'));
+
+        if (!isNaN(min) && !isNaN(max)) {
+            if (value < min || value > max) {
+                errorDiv.textContent = 'Значение должно быть в диапазоне от ' + min + ' до ' + max + '.';
+                isValid = false;
+                break;
+            }
+        } else if (!isNaN(min)) {
+            if (value < min) {
+                errorDiv.textContent = 'Значение должно быть не менее ' + min + '.';
+                isValid = false;
+                break; 
+            }
+        }
+
+        sessionStorage.setItem('question_' + field.getAttribute('question'), field.value);
+    }
+
+    if (isValid) { 
+        nextQuestion();
+    }
 }

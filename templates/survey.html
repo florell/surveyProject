@@ -31,12 +31,25 @@
                         </button>
                     {{end}}
                 {{else}}
-                    <input
-                        type="number"
-                        class="input-answer"
-                        placeholder="Количество баллов"
-                        question="{{$question.QuestionID}}">
+                    {{ if eq $question.MaxValue 0}}
+                        <input
+                            type="number"
+                            class="input-answer"
+                            min="0"
+                            placeholder="Количество баллов"
+                            question="{{$question.QuestionID}}">
+                        <div class="error-message" id="error-{{$question.QuestionID}}"></div>
+                    {{else}}
+                        <input
+                            type="number"
+                            class="input-answer"
+                            min="0"
+                            max="{{$question.MaxValue}}"
+                            placeholder="Количество баллов"
+                            question="{{$question.QuestionID}}">
+                        <div class="error-message" id="error-{{$question.QuestionID}}"></div>
                 {{end}}
+            {{end}}
             </div>
         </div>
         {{end}}

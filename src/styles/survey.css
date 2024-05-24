@@ -113,3 +113,9 @@ h2 {
     width: 100%;
     max-width: 400px;
 }
+
+.error-message {
+    color: red; /* Цвет текста ошибки */
+    font-size: 0.9em;
+    margin-top: 5px;
+}

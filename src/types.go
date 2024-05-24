@@ -9,9 +9,10 @@ type Answer struct {
 }
 
 type Question struct {
-	QuestionID int
-	Title      template.HTML
-	Answers    []Answer
+	QuestionID int           `json:"ID"`
+	Title      template.HTML `json:"Title"`
+	Answers    []Answer      `json:"Answers"`
+	MaxValue   int           `json:"MaxPoints"`
 }
 
 type Survey struct {

@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS questions (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     SurveyID INT,
     Title TEXT,
+    MaxVal INT DEFAULT NULL,
     FOREIGN KEY (SurveyID) REFERENCES surveys(ID)
 );
 

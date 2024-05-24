@@ -11,7 +11,7 @@ import (
 	types "psychward/src"
 	"sort"
 	"strconv"
-	
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -46,7 +46,7 @@ func pushTest(db *sql.DB) {
 	if count != 0 {
 		return
 	}
-	
+
 	files, err := FilePathWalkDir("surveys")
 	if err != nil {
 		log.Fatalln(err)
@@ -55,7 +55,7 @@ func pushTest(db *sql.DB) {
 		return getNum(files[i]) < getNum(files[j])
 	})
 	fmt.Println(files)
-	
+
 	for _, file := range files {
 		fmt.Println(file)
 		jsonFile, err := os.Open(file)
@@ -64,24 +64,24 @@ func pushTest(db *sql.DB) {
 		}
 		defer jsonFile.Close()
 		byteValue, _ := io.ReadAll(jsonFile)
-		
+
 		var survey types.Survey
-		
+
 		if err := json.Unmarshal(byteValue, &survey); err != nil {
 			panic(err)
 		}
-		
+
 		insertSurveyQuery := "INSERT INTO surveys (id, title, description) VALUES (?, ?, ?)"
 		res, err := db.Exec(insertSurveyQuery, survey.SurveyID, survey.Title, survey.Description)
 		if err != nil {
 			log.Fatalf("Error inserting survey: %v", err)
 		}
-		
+
 		surveyID, _ := res.LastInsertId()
 		for _, question := range survey.Questions {
 			// Insert question data into the database
-			insertQuestionQuery := "INSERT INTO questions (surveyid, title) VALUES (?, ?)"
-			res, err := db.Exec(insertQuestionQuery, surveyID, question.Title)
+			insertQuestionQuery := "INSERT INTO questions (surveyid, title, MaxVal) VALUES (?, ?, ?)"
+			res, err := db.Exec(insertQuestionQuery, surveyID, question.Title, question.MaxValue)
 			if err != nil {
 				log.Fatalf("Error inserting question: %v", err)
 			}
@@ -89,7 +89,7 @@ func pushTest(db *sql.DB) {
 			if err != nil {
 				log.Fatalf("Error getting last insert ID for question: %v", err)
 			}
-			
+
 			// Insert answer data into the database
 			for _, answer := range question.Answers {
 				insertAnswerQuery := "INSERT INTO answers (questionid, text, value) VALUES (?, ?, ?)"
@@ -99,8 +99,8 @@ func pushTest(db *sql.DB) {
 				}
 			}
 		}
-		
+
 	}
-	
+
 	fmt.Println("Survey data inserted into the database successfully.")
 }

@@ -226,7 +226,7 @@ func surveyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Fetch questions and answers for the survey from the database
-	rows, err := db.Query("SELECT id, title FROM questions WHERE surveyid = ?", survey.SurveyID)
+	rows, err := db.Query("SELECT id, title, maxval FROM questions WHERE surveyid = ?", survey.SurveyID)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -238,7 +238,7 @@ func surveyHandler(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		var question types.Question
-		err := rows.Scan(&question.QuestionID, &question.Title)
+		err := rows.Scan(&question.QuestionID, &question.Title, &question.MaxValue)
 		if err != nil {
 			log.Fatal(err)
 		}

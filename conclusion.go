@@ -54,6 +54,7 @@ func makeConclusion(db *sql.DB, patientID string) error {
 	doc := docx.New().WithDefaultTheme()
 
 	lastDate := ""
+	flag := true
 
 	// Добавление заголовка
 	paraTitle := doc.AddParagraph()
@@ -87,6 +88,12 @@ func makeConclusion(db *sql.DB, patientID string) error {
 			paraDates.AddText(s.CurDate + "; ")
 			lastDate = s.CurDate
 		}
+		if s.SurveyID >= 7 && flag {
+			paraT := doc.AddParagraph()
+			paraT.AddText("Обследование эмоционально-личностной сферы").Bold()
+			flag = false
+		}
+
 		paraTemp := doc.AddParagraph()
 		surveyName, _ := getSurveyName(db, s.SurveyID)
 		paraTemp.AddText(surveyName + ": ").Bold()
@@ -128,6 +135,12 @@ func makeConclusion(db *sql.DB, patientID string) error {
 				}
 				rrr := strings.TrimRight(strings.Join(fr, ""), " ") + "; "
 				paraTemp.AddText(rrr)
+			case string:
+				if value == "code" {
+					paraTemp.AddText("Код профиля: ")
+					paraTemp.AddText(v).Underline("single")
+					paraTemp.AddText("; ")
+				}
 			}
 		}
 

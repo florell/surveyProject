@@ -16,12 +16,16 @@
     </div>
     <!--<h1 class="text-center mb-4">Выберите опрос:</h1>-->
     <div class="row row-cols-1 row-cols-md-3">
-        {{range $i, $survey := .Surveys}}
+        {{range $i, $surveyWithCheck := .SurveysWithCheck}}
         <div class="col mb-4">
-            <div class="card text-center p-4 card-color-{{$i}}" onclick="redirectToSurvey('{{.SurveyID}}')">
-                <h5 class="card-title">{{$survey.Title}}</h5>
-                <button class="btn btn-primary btn-sm more-info-btn" onclick="showModal('{{$survey.Title}}', '{{$survey.Description}}')">Подробнее</button>
-                <div class="description" style="display: none;">{{$survey.Description}}</div>
+            <div class="card text-center p-4 card-color-{{$i}}" onclick="redirectToSurvey('{{$surveyWithCheck.Survey.SurveyID}}')">
+                <h5 class="card-title">{{$surveyWithCheck.Survey.Title}}</h5>
+                {{if $surveyWithCheck.Completed}}
+                    <button class="btn btn-primary btn-sm more-info-completed-btn" onclick="showModal('{{$surveyWithCheck.Survey.Title}}', '{{$surveyWithCheck.Survey.Description}}')">Подробнее</button>
+                {{else}}
+                    <button class="btn btn-primary btn-sm more-info-btn" onclick="showModal('{{$surveyWithCheck.Survey.Title}}', '{{$surveyWithCheck.Survey.Description}}')">Подробнее</button>
+                {{end}}
+                <div class="description" style="display: none;">{{$surveyWithCheck.Survey.Description}}</div>
             </div>
         </div>
         {{end}}

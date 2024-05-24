@@ -70,6 +70,18 @@ body {
     background-color: #0056b3;
     border-color: #0056b3;
 }
+
+.more-info-completed-btn {
+    background-color: #4CAF50; 
+    border-color: #4CAF50; 
+    color: white; 
+}
+
+.more-info-btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
 .close:focus,
 .close:active {
     outline: none;

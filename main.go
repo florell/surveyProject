@@ -166,25 +166,40 @@ func chooseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var surveys []types.Survey
+	surveysWithCheck := []struct {
+		Survey    types.Survey
+		Completed bool
+	}{}
+
 	for rows.Next() {
-		var survey types.Survey
-		err := rows.Scan(&survey.SurveyID, &survey.Title, &survey.Description)
+		surveyWithCheck := struct {
+			Survey    types.Survey
+			Completed bool
+		}{}
+		err := rows.Scan(&surveyWithCheck.Survey.SurveyID, &surveyWithCheck.Survey.Title, &surveyWithCheck.Survey.Description)
 		if err != nil {
 			log.Fatal(err)
 		}
-		surveys = append(surveys, survey)
+		row := db.QueryRow("SELECT EXISTS (SELECT 1 FROM survey_results WHERE SurveyID = ? AND PatientID = ?) AS RecordExists", surveyWithCheck.Survey.SurveyID, patientId)
+		err = row.Scan(&surveyWithCheck.Completed)
+		if err != nil {
+			log.Fatal(err)
+		}
+		surveysWithCheck = append(surveysWithCheck, surveyWithCheck)
 	}
 
 	tmpl := template.Must(template.ParseFiles("templates/choose.html"))
 
 	data := struct {
-		Surveys []types.Survey
-		ID      string
-		Age     string
-		Name    string
-		Gender  string
-	}{surveys, strconv.Itoa(int(patientId)), patientAge, patientName, patientGender}
+		SurveysWithCheck []struct {
+			Survey    types.Survey
+			Completed bool
+		}
+		ID     string
+		Age    string
+		Name   string
+		Gender string
+	}{surveysWithCheck, strconv.Itoa(int(patientId)), patientAge, patientName, patientGender}
 
 	if err := tmpl.Execute(w, data); err != nil {
 		log.Println(err)

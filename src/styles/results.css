@@ -91,3 +91,10 @@ h1 {
     width: 40px; /* Ширина серой области */
     background-color: #ccc; /* Цвет серой области */
 }
+
+.dividing-line {
+    border: 0;
+    height: 1px;
+    background: #ccc;
+    margin: 20px 0;
+}

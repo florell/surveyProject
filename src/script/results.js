@@ -114,6 +114,11 @@ function renderProgressBars(data) {
                 } else {
                     progressBarContainer.innerHTML += progressBarHTML;
                 }
+
+                if (key === 'Социальная защита (СЗ-С)') {
+                    const dividingLineHTML = '<hr class="dividing-line">';
+                    progressBarContainer.innerHTML += dividingLineHTML;
+                }
             }
         }
     }

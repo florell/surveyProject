@@ -9,7 +9,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-
+	
 	"github.com/fumiama/go-docx"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -17,7 +17,7 @@ import (
 func declineAge(sAge string) string {
 	yearForms := []string{"год", "года", "лет"}
 	age, _ := strconv.Atoi(sAge)
-
+	
 	var form string
 	if age%10 == 1 && age%100 != 11 {
 		form = yearForms[0]
@@ -26,7 +26,7 @@ func declineAge(sAge string) string {
 	} else {
 		form = yearForms[2]
 	}
-
+	
 	return fmt.Sprintf("%d %s", age, form)
 }
 
@@ -36,26 +36,26 @@ func makeConclusion(db *sql.DB, patientID string) error {
 	if err != nil {
 		return err
 	}
-
+	
 	// Выполнение SQL-запроса
-	rows, err := db.Query("SELECT SurveyID, Result, CurDate, Description FROM survey_results WHERE PatientID = ? ORDER BY CurDate ASC", patientID)
+	rows, err := db.Query("SELECT SurveyID, Result, DATE_FORMAT(CurDate, '%d-%m-%Y') AS CurDate, Description FROM survey_results WHERE PatientID = ? ORDER BY CurDate ASC", patientID)
 	if err != nil {
 		return err
 	}
 	defer rows.Close()
-
+	
 	intPId, _ := strconv.Atoi(patientID)
 	patient, err := getPatient(db, intPId)
-
+	
 	if err != nil {
 		return err
 	}
-
+	
 	doc := docx.New().WithDefaultTheme()
-
+	
 	lastDate := ""
 	flag := true
-
+	
 	// Добавление заголовка
 	paraTitle := doc.AddParagraph()
 	paraTitle.AddText("Заключение по результатам экспериментально-психологического обследования").Bold()
@@ -65,13 +65,13 @@ func makeConclusion(db *sql.DB, patientID string) error {
 	paraAge := doc.AddParagraph()
 	paraAge.AddText("Возраст: ").Bold()
 	paraAge.AddText(declineAge(patient.Age))
-
+	
 	paraDates := doc.AddParagraph()
 	paraDates.AddText("Даты обследования: ").Bold()
-
+	
 	paraR := doc.AddParagraph()
 	paraR.AddText("Обследование когнитивной сферы").Bold()
-
+	
 	for rows.Next() {
 		s := struct {
 			SurveyID    int
@@ -79,7 +79,7 @@ func makeConclusion(db *sql.DB, patientID string) error {
 			CurDate     string
 			Description sql.NullString
 		}{}
-
+		
 		err = rows.Scan(&s.SurveyID, &s.Result, &s.CurDate, &s.Description)
 		if err != nil {
 			log.Fatalln(err)
@@ -93,17 +93,17 @@ func makeConclusion(db *sql.DB, patientID string) error {
 			paraT.AddText("Обследование эмоционально-личностной сферы").Bold()
 			flag = false
 		}
-
+		
 		paraTemp := doc.AddParagraph()
 		surveyName, _ := getSurveyName(db, s.SurveyID)
 		paraTemp.AddText(surveyName + ": ").Bold()
-
+		
 		var data map[string]interface{}
 		err = json.Unmarshal([]byte(s.Result), &data)
 		if err != nil {
 			return err
 		}
-
+		
 		sdata := []string{}
 		for o := range data {
 			sdata = append(sdata, o)
@@ -143,14 +143,14 @@ func makeConclusion(db *sql.DB, patientID string) error {
 				}
 			}
 		}
-
+		
 	}
-
+	
 	// Проверка на ошибки
 	if err := rows.Err(); err != nil {
 		return err
 	}
-
+	
 	// Сохранение документа
 	f, err := os.Create("conclusion_" + patientID + ".docx")
 	if err != nil {
@@ -164,6 +164,6 @@ func makeConclusion(db *sql.DB, patientID string) error {
 	if err != nil {
 		panic(err)
 	}
-
+	
 	return nil
 }

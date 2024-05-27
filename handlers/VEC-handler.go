@@ -15,6 +15,13 @@ type VECResult struct {
 	AP          VECField `json:"Абсолютный показатель (сумма результатов по субтестам)"`
 	KP          VECField `json:"Корригированный на возраст показатель"`
 	IPP         VECField `json:"Эквивалентный интеллекту показатель памяти"`
+	I           VECField `json:"Личные и общественные (исторические) данные"`
+	II          VECField `json:"Ориентировка в настоящем"`
+	III         VECField `json:"Психический контроль"`
+	IV          VECField `json:"Логическая память"`
+	V           VECField `json:"Цифры"`
+	VI          VECField `json:"Визуальная репродукция"`
+	VII         VECField `json:"Парные ассоциации"`
 	Description string   `json:"description"`
 }
 
@@ -203,67 +210,91 @@ func getIPP(KP int) int {
 	return IPP
 }
 
-func VECHandler(s *types.SurveyResults) []byte {
-	AP := 0
-	for _, val := range s.Picked {
-		AP += val
-	}
-	
-	KP := getKP(AP)
-	IPP := getIPP(KP)
-	
+func getVECDescription(result VECResult) string {
 	desc := ""
 	switch {
-	case IPP >= 110:
+	case result.IPP.Value >= 110:
 		desc = "нормальное функционирование памяти"
-	case IPP >= 93 && IPP <= 106:
+	case result.IPP.Value >= 93 && result.IPP.Value <= 106:
 		desc = "нарушения памяти легкой степени"
-	case IPP >= 73 && IPP <= 87:
+	case result.IPP.Value >= 73 && result.IPP.Value <= 87:
 		desc = "нарушения памяти умеренной степени"
-	case IPP >= 48 && IPP <= 66:
+	case result.IPP.Value >= 48 && result.IPP.Value <= 66:
 		desc = "нарушения памяти выраженной степени"
 	}
 	
 	switch {
-	case IPP >= 130:
+	case result.IPP.Value >= 130:
 		desc += "/ очень высокий"
-	case IPP >= 120 && IPP <= 129:
+	case result.IPP.Value >= 120 && result.IPP.Value <= 129:
 		desc += "/ высокий"
-	case IPP >= 110 && IPP <= 119:
+	case result.IPP.Value >= 110 && result.IPP.Value <= 119:
 		desc += "/ хорошая норма"
-	case IPP >= 90 && IPP <= 109:
+	case result.IPP.Value >= 90 && result.IPP.Value <= 109:
 		desc += "/ средний"
-	case IPP >= 80 && IPP <= 89:
+	case result.IPP.Value >= 80 && result.IPP.Value <= 89:
 		desc += "/ низкая (плохая) норма"
-	case IPP >= 70 && IPP <= 79:
+	case result.IPP.Value >= 70 && result.IPP.Value <= 79:
 		desc += "/ пограничная зона"
-	case IPP <= 69:
+	case result.IPP.Value <= 69:
 		desc += "/ умственный дефект"
 	}
 	
 	switch {
-	case IPP >= 68 && IPP <= 80:
+	case result.IPP.Value >= 68 && result.IPP.Value <= 80:
 		desc += "/ пограничная УО"
-	case IPP >= 52 && IPP <= 57:
+	case result.IPP.Value >= 52 && result.IPP.Value <= 57:
 		desc += "/ легкая УО (дебильность)"
-	case IPP >= 36 && IPP <= 51:
+	case result.IPP.Value >= 36 && result.IPP.Value <= 51:
 		desc += "/ умеренная (средняя) УО, невыраженная имбецильность"
-	case IPP >= 20 && IPP <= 35:
+	case result.IPP.Value >= 20 && result.IPP.Value <= 35:
 		desc += "/ глубокая УО, выраженная имбецильность"
-	case IPP < 20:
+	case result.IPP.Value < 20:
 		desc += "/ полная уо (идиотия)"
 	}
 	
-	result := VECResult{VECField{
-		Value:    AP,
-		MaxValue: 93,
-	}, VECField{
-		Value:    KP,
-		MaxValue: 93 + 56,
-	}, VECField{
-		Value:    IPP,
-		MaxValue: 143,
-	}, desc}
+	return desc
+}
+
+func VECHandler(s *types.SurveyResults) []byte {
+	result := VECResult{}
+	for _, val := range s.Picked {
+		result.AP.Value += val
+	}
+	
+	result.I.Value = s.Picked[0+399]
+	result.I.MaxValue = 6
+	
+	result.II.Value = s.Picked[1+399]
+	result.II.MaxValue = 5
+	
+	result.III.Value = s.Picked[2+399] + s.Picked[3+399] + s.Picked[4+399]
+	result.III.MaxValue = 9
+	
+	result.IV.Value = (s.Picked[5+399] + s.Picked[6+399]) / 2
+	result.IV.MaxValue = 23
+	
+	result.V.Value = s.Picked[7+399] + s.Picked[8+399]
+	result.V.MaxValue = 15
+	
+	result.VI.Value = s.Picked[9+399] + s.Picked[10+399] + s.Picked[11+399] + s.Picked[12+399]
+	result.VI.MaxValue = 14
+	
+	result.VII.Value = s.Picked[13+399]/2 + s.Picked[14+399]
+	result.VII.MaxValue = 21
+	
+	result.AP.Value -= (s.Picked[5+399] + s.Picked[6+399]) / 2
+	result.AP.Value -= s.Picked[13+399] / 2
+	result.AP.MaxValue = 93
+	
+	result.KP.Value = getKP(result.AP.Value)
+	result.KP.MaxValue = 93 + 56
+	
+	result.IPP.Value = getIPP(result.KP.Value)
+	result.IPP.MaxValue = 143
+	
+	result.Description = getVECDescription(result)
+	
 	resultJSON, err := json.Marshal(result)
 	if err != nil {
 		log.Fatalln(err)

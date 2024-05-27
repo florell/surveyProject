@@ -59,8 +59,10 @@ func ACEHandler(s *types.SurveyResults) []byte {
 	
 	if result.Overall.Value >= 88 {
 		result.Description = "Когнитивных нарушений не обнаружено"
+	} else if result.Overall.Value >= 79 && result.Overall.Value <= 87 {
+		result.Description = "Выявляется наличие когнитивных нарушений"
 	} else {
-		result.Description = "обнаружено когнитивное нарушение"
+		result.Description = "Выявляется наличие выраженных когнитивных нарушений (деменция)"
 	}
 	
 	resultJSON, err := json.Marshal(result)

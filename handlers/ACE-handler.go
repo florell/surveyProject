@@ -31,17 +31,17 @@ func ACEHandler(s *types.SurveyResults) []byte {
 		VSO:         ACEField{0, 16},
 		Description: "",
 	}
-
+	
 	minId := 100000
 	for key, _ := range s.Picked {
 		if key < minId {
 			minId = key
 		}
 	}
-
+	
 	for key, value := range s.Picked {
 		result.Overall.Value += value
-
+		
 		id := key%minId + 1
 		switch id {
 		case 1, 2, 3, 4:
@@ -56,13 +56,13 @@ func ACEHandler(s *types.SurveyResults) []byte {
 			result.VSO.Value += value
 		}
 	}
-
+	
 	if result.Overall.Value >= 88 {
-		result.Description = "Норма"
+		result.Description = "Когнитивных нарушений не обнаружено"
 	} else {
-		result.Description = "Не норма"
+		result.Description = "обнаружено когнитивное нарушение"
 	}
-
+	
 	resultJSON, err := json.Marshal(result)
 	if err != nil {
 		log.Fatalln(err)

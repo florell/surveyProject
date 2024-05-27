@@ -428,7 +428,7 @@ func submitSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}(stmt)
 	
-	fmt.Println("Analysis:", string(analysis))
+	// fmt.Println("Analysis:", string(analysis))
 	// Execute the SQL statement
 	_, err = stmt.Exec(patientID, surveyID, string(analysis), string(analysis))
 	if err != nil {

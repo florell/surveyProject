@@ -14,13 +14,13 @@ RUN go mod download
 COPY . ./
 
 # Build the Go app
-RUN go build -o surveyPrj .
+RUN go build -o /surveyPrj
 
 # Expose port 8080 to the outside world
 EXPOSE 8080
 
-RUN chmod +x surveyPrj
+RUN chmod +x /surveyPrj
 
 # Command to run the executable
-CMD ["./surveyPrj"]
-
+RUN echo $(ls -l)
+CMD ["/surveyPrj"]

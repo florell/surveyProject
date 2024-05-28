@@ -528,10 +528,10 @@ func resultHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
-	host := os.Getenv("DB_HOST")
-	dbname := os.Getenv("DB_NAME")
+	user := os.Getenv("MYSQL_USER")
+	password := os.Getenv("MYSQL_PASSWORD")
+	host := os.Getenv("MYSQL_HOST")
+	dbname := os.Getenv("MYSQL_DATABASE")
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s", user, password, host, dbname)
 	db, err := sql.Open("mysql", dsn)

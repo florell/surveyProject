@@ -2,21 +2,28 @@ version: '3.8'
 
 services:
   mysql:
-    image: mysql:latest
+    build: ./sqldf
     container_name: mysql_container
+    ports:
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    networks:
-      - psy_network
+      MYSQL_HOST: ${MYSQL_HOST}
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      interval: 3s
+      retries: 10
+    volumes:
+      - mysql_volume:/var/lib/mysql
+      - ./sql/:/docker-entrypoint-initdb.d/
 
   app:
-    build:
-      context: .
-      args:
-        platform: linux/arm64
+    build: .
     container_name: go_container
     ports:
       - "8080:8080"
@@ -28,11 +35,10 @@ services:
       DB_PASSWORD: ${MYSQL_PASSWORD}
       DB_HOST: mysql_container
       DB_NAME: ${MYSQL_DATABASE}
-    networks:
-      - psy_network
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
 
-networks:
-  psy_network:
-    driver: bridge
+volumes:
+  mysql_volume:
+  .:

@@ -38,7 +38,7 @@
                             min="0"
                             placeholder="Количество баллов"
                             question="{{$question.QuestionID}}">
-                        <div class="error-message" id="error-{{$question.QuestionID}}"></div>
+<!--                        <div class="error-message" id="error-{{$question.QuestionID}}"></div>-->
                     {{else}}
                         <input
                             type="number"
@@ -47,8 +47,9 @@
                             max="{{$question.MaxValue}}"
                             placeholder="Количество баллов"
                             question="{{$question.QuestionID}}">
-                        <div class="error-message" id="error-{{$question.QuestionID}}"></div>
+<!--                        <div class="error-message" id="error-{{$question.QuestionID}}"></div>-->
                 {{end}}
+                        <div class="error-message" id="error-{{$question.QuestionID}}"></div>
             {{end}}
             </div>
         </div>

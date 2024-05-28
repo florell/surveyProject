@@ -5,7 +5,6 @@ function saveValue(button) {
 }
 
 let nextQuestion;
-let firstQuestionID;
 let currentQuestion = 0;
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -13,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let prevButton = document.getElementById('prev-button');
     let nextButton = document.getElementById('next-button');
     let questionCount = parseInt(document.getElementById('questionCount').value);
-    firstQuestionID = parseInt(document.getElementById('firstQuestionID').value);
+    let firstQuestionID = parseInt(document.getElementById('firstQuestionID').value);
 
     function showQuestion(questionIndex) {
         if (questionIndex === questionCount) {

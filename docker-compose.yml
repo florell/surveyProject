@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      - psy_network
+
+  app:
+    build:
+      context: .
+      args:
+        platform: linux/arm64
+    container_name: go_container
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+
+    environment:
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_HOST: mysql_container
+      DB_NAME: ${MYSQL_DATABASE}
+    networks:
+      - psy_network
+    depends_on:
+      - mysql
+
+networks:
+  psy_network:
+    driver: bridge

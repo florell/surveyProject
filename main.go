@@ -528,11 +528,22 @@ func resultHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	var err error
-	db, err = sql.Open("mysql", "psy_admin:pw2319#@tcp(127.0.0.1:3306)/psy_data")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	host := os.Getenv("DB_HOST")
+	dbname := os.Getenv("DB_NAME")
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s", user, password, host, dbname)
+	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	err = db.Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	defer func(db *sql.DB) {
 		if err := db.Close(); err != nil {
 			log.Println(err)

@@ -65,10 +65,12 @@ document.addEventListener("DOMContentLoaded", function() {
             if (answerButton) {
                 answerButton.click();
             }
-        }
-        if (event.keyCode === 27) {
+        } else if (event.keyCode === 27) {
             let prevButton = document.getElementById('prev-button');
             prevButton.click();
+        } else if (event.keyCode === 13) {
+            let nextButton = document.getElementById('next-button');
+            nextButton.click();
         }
     });
 });
@@ -103,6 +105,13 @@ function saveValueFromFields() {
         let min = parseInt(field.getAttribute('min'));
         let max = parseInt(field.getAttribute('max'));
         let errorDiv = document.getElementById('error-' + field.getAttribute('question'));
+
+        if (!field.value.trim().length) {
+            console.log("Поле пустое")
+            errorDiv.textContent = 'Поле не должно быть пустым.';
+            isValid = false;
+            break;
+        }
 
         if (!isNaN(min) && !isNaN(max)) {
             if (value < min || value > max) {

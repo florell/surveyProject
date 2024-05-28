@@ -21,7 +21,7 @@ body {
 }
 #question-container {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: -15px;
 }
 .question {
     margin-bottom: 20px;

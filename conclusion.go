@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 
@@ -108,7 +107,6 @@ func makeConclusion(db *sql.DB, patientID string) error {
 		for o := range data {
 			sdata = append(sdata, o)
 		}
-		sort.Strings(sdata)
 		for _, value := range sdata {
 			switch v := data[value].(type) {
 			case map[string]interface{}:
@@ -116,16 +114,19 @@ func makeConclusion(db *sql.DB, patientID string) error {
 				for g := range v {
 					sk = append(sk, g)
 				}
-				sort.Strings(sk)
+				log.Println(sk)
 				fr := make([]string, 4, 10)
 				fr[0] = value + " "
 				for _, k := range sk {
 					if s, ok := v[k].(float64); ok && k == "value" {
 						ss := strconv.FormatFloat(s, 'f', 0, 64)
-						fr[1] = ss + "/"
+						fr[1] = ss
 					} else if s, ok := v[k].(float64); ok && k == "max_value" {
+						if s == -1 {
+							continue
+						}
 						ss := strconv.FormatFloat(s, 'f', 0, 64)
-						fr[2] = ss
+						fr[2] = "/" + ss
 					} else if s, ok := v[k].(string); ok && k == "description" {
 						if s == "" {
 							continue
@@ -140,6 +141,9 @@ func makeConclusion(db *sql.DB, patientID string) error {
 					paraTemp.AddText("Код профиля: ")
 					paraTemp.AddText(v).Underline("single")
 					paraTemp.AddText("; ")
+				}
+				if value == "description" {
+					paraTemp.AddText("Вывод: " + v + "; ").Italic()
 				}
 			}
 		}

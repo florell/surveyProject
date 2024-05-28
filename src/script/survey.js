@@ -5,14 +5,15 @@ function saveValue(button) {
 }
 
 let nextQuestion;
+let firstQuestionID;
+let currentQuestion = 0;
 
 document.addEventListener("DOMContentLoaded", function() {
-    let currentQuestion = 0;
     let questions = document.querySelectorAll('.question');
     let prevButton = document.getElementById('prev-button');
     let nextButton = document.getElementById('next-button');
     let questionCount = parseInt(document.getElementById('questionCount').value);
-    let firstQuestionID = parseInt(document.getElementById('firstQuestionID').value);
+    firstQuestionID = parseInt(document.getElementById('firstQuestionID').value);
 
     function showQuestion(questionIndex) {
         if (questionIndex === questionCount) {
@@ -106,7 +107,7 @@ function saveValueFromFields() {
         let max = parseInt(field.getAttribute('max'));
         let errorDiv = document.getElementById('error-' + field.getAttribute('question'));
 
-        if (!field.value.trim().length) {
+        if (!field.value.trim().length && i === currentQuestion) {
             console.log("Поле пустое")
             errorDiv.textContent = 'Поле не должно быть пустым.';
             isValid = false;

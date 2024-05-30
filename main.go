@@ -529,16 +529,27 @@ func resultHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	user := "psy_admin"
-	pass := "pw2319#"
-	host := "localhost"
-	table := "psy_data"
+	user := os.Getenv("DB_USER")
+	pass := os.Getenv("DB_PASSWORD")
+	host := os.Getenv("DB_HOST")
+	name := os.Getenv("DB_NAME")
 
 	var err error
-	db, err = sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:3306)/%s", user, pass, host, table))
-	if err != nil {
-		log.Fatal(err)
+	for {
+		db, err = sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:3306)/%s", user, pass, host, name))
+		if err != nil {
+			log.Println("Error opening database:", err)
+		} else {
+			err = db.Ping()
+			if err == nil {
+				break
+			}
+			log.Println("Waiting for database to be ready:", err)
+			db.Close()
+		}
+		time.Sleep(5 * time.Second) // Повторяем пинг каждые 5 секунд
 	}
+	
 	defer func(db *sql.DB) {
 		if err := db.Close(); err != nil {
 			log.Println(err)

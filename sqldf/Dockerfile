@@ -1,4 +1,4 @@
-FROM mysql:latest;
+FROM mysql:latest
 
 COPY entrypoint.sh /entrypoint.sh
 

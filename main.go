@@ -528,12 +528,12 @@ func resultHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	user := os.Getenv("MYSQL_USER")
-	password := os.Getenv("MYSQL_PASSWORD")
-	host := os.Getenv("MYSQL_HOST")
-	dbname := os.Getenv("MYSQL_DATABASE")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	host := os.Getenv("DB_HOST")
+	dbname := os.Getenv("DB_NAME")
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s", user, password, host, dbname)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s", user, password, host, dbname)
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatal(err)
@@ -581,7 +581,7 @@ func main() {
 			log.Fatalf("listen: %s\n", err)
 		}
 	}()
-	log.Printf("Server started serving on port: %s", srv.Addr)
+	log.Printf("Server started serving on port %s", srv.Addr)
 
 	// Ожидание сигнала остановки сервера
 	quit := make(chan os.Signal, 1)
